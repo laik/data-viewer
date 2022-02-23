@@ -49,7 +49,7 @@ module.exports = withPlugins(plugins, {
         },
         {
           source: "/wel/apis/:path*",
-          destination: `http://${cloudURL}/:path*`,
+          destination: `http://${cloudURL}/wel/apis/:path*`,
         },
       ];
     }

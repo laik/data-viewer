@@ -11,7 +11,7 @@ interface RouterProps {
 
 export interface WelcomeProps extends RouterProps { }
 @observer
-@storeables([bossStore], false) // 注入多个store，可以自动loadAll与watch数据
+@storeables([bossStore], true) // 注入多个store，可以自动loadAll与watch数据
 export default class Welcome<P extends WelcomeProps> extends React.Component<P> {
 
     @observable static data: {
