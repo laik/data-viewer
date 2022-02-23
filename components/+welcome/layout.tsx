@@ -19,7 +19,7 @@ export default class Welcome<P extends WelcomeProps> extends React.Component<P> 
     defaultSortInfo: { name: string };
 
     @computed get v() {
-        return bossStore.items[0].version
+        return bossStore.items.length != 0 ? bossStore.items[0].version : '0';
     }
 
     render() {
