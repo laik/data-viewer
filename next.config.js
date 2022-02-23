@@ -37,19 +37,19 @@ module.exports = withPlugins(plugins, {
   },
 
   async rewrites() {
-    const cloudurl = process.env.CLOUD_URL || "localhost:8080";
+    // const cloudurl = process.env.CLOUD_URL || "localhost:8080";
+    const cloudURL = "localhost:8080";
     let r = [];
     if (process.env.NODE_ENV == "development") {
       // ⚠️ api顺序最上层优先
       r = [
         {
           source: "/user-login",
-          destination: `http://${cloudurl}/user-login`,
+          destination: `http://${cloudURL}/user-login`,
         },
-
         {
-          source: "/api/:path*",
-          destination: `http://${cloudurl}/:path*`,
+          source: "/wel/apis/:path*",
+          destination: `http://${cloudURL}/:path*`,
         },
       ];
     }
