@@ -1,6 +1,6 @@
-import {merge} from 'lodash';
+import { merge } from 'lodash';
 import store from 'store';
-import {UserConfig} from './user-config';
+import { UserConfig } from './user.config';
 
 const persistKey = 'persist:nextjs';
 

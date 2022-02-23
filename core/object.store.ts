@@ -5,7 +5,7 @@ import { IObject } from './object';
 import { IObjectApiQueryParams, ObjectApi } from './object.api';
 import { ObjectJsonApiData } from './object.json.api';
 import { IObjectWatchEvent, objectWatchApi } from './object.watch.api';
-import { redux_userconfig } from './redux-store';
+import { redux_userconfig } from './redux.store';
 import { bind } from './utils/bind';
 
 export interface IObjectStoreParams {

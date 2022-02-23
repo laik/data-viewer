@@ -3,7 +3,7 @@ import { RequestInit, Response } from 'node-fetch';
 import { stringify } from 'querystring';
 import { onApiError } from './index';
 import { ObjectJsonApiError } from './object.json.api';
-import { redux_userconfig } from './redux-store';
+import { redux_userconfig } from './redux.store';
 import { cancelableFetch } from './utils';
 import { EventEmitter } from './utils/emitter';
 

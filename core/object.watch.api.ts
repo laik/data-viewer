@@ -4,8 +4,8 @@ import { apiManager } from './api.manager';
 import { EventSourcePolyfill as EventSource } from './eventsource/eventsource';
 import { JsonApiData, ObjectStore } from './index';
 import { ObjectApi } from './object.api';
-import { redux_update_userconfig, redux_userconfig } from './redux-store';
-import { UserConfig } from './user-config';
+import { redux_update_userconfig, redux_userconfig } from './redux.store';
+import { UserConfig } from './user.config';
 import { bind, EventEmitter, interval } from './utils';
 
 export interface IWatchRouteQuery {
