@@ -4,14 +4,14 @@ import { apiManager } from './api.manager';
 import { EventSourcePolyfill as EventSource } from './eventsource/eventsource';
 import { JsonApiData, ObjectStore } from './index';
 import { ObjectApi } from './object.api';
-import { redux_update_userconfig, redux_userconfig } from './redux.store';
+import { redux_userconfig } from './redux.store';
 import { UserConfig } from './user.config';
 import { bind, EventEmitter, interval } from './utils';
 
 export interface IWatchRouteQuery {
   api: string | string[];
 }
-export interface IObjectWatchEvent<T = any> {
+export interface IObjectWatchEvent<T extends Object = any> {
   type: 'ADDED' | 'MODIFIED' | 'DELETED';
   object?: T;
   store?: ObjectStore;
@@ -122,13 +122,14 @@ export class ObjectWatchApi {
   }
 
   protected onMessage(evt: MessageEvent) {
+    console.log("on message", evt);
     if (!evt.data) return;
     let data = JSON.parse(evt.data);
     if (!this.onData) {
       return;
     }
     if ((data as IObjectWatchEvent).object) {
-      console.log("onMessage:", evt.type, evt.data.object);
+      console.log("onMessage--->:", evt.data);
       this.onData.emit(data);
     } else {
       if (typeof this.onRouteEvent === 'function') {
@@ -157,7 +158,7 @@ export class ObjectWatchApi {
     } else if (type === "USER_CONFIG") {
       // 用户信息经过 watch 推流
       // console.log('onMessage: update config');
-      redux_update_userconfig(userConfig)
+      // redux_update_userconfig(userConfig)
     }
   }
 

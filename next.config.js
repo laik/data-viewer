@@ -48,6 +48,10 @@ module.exports = withPlugins(plugins, {
           destination: `http://${cloudURL}/user-login`,
         },
         {
+          source: "/watch",
+          destination: `http://${cloudURL}/watch`,
+        },
+        {
           source: "/wel/apis/:path*",
           destination: `http://${cloudURL}/wel/apis/:path*`,
         },

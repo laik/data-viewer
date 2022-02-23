@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import { action, observable, reaction } from 'mobx';
+import { action, computed, observable, reaction } from 'mobx';
 import { ItemStore } from './item.store';
 import { IObject } from './object';
 import { IObjectApiQueryParams, ObjectApi } from './object.api';
@@ -39,7 +39,7 @@ export abstract class ObjectStore<T extends IObject = any> extends ItemStore<T> 
   }
 
   getById(id: string): T {
-    return this.items.find(item => item.getId() === id);
+    return this._items.find(item => item.getId() === id);
   }
 
   protected async loadItems(ns?: string[]): Promise<T[]> {
@@ -61,8 +61,8 @@ export abstract class ObjectStore<T extends IObject = any> extends ItemStore<T> 
       items = await this.loadItems()
     } catch (e) {
     } finally {
-      if (this.items) {
-        this.items.replace(items);
+      if (this._items) {
+        this._items.replace(items);
       }
       this.isLoaded = true
       this.isLoading = false
@@ -76,18 +76,18 @@ export abstract class ObjectStore<T extends IObject = any> extends ItemStore<T> 
   async create(params: IObjectStoreParams, data?: Partial<T>, query?: IObjectApiQueryParams): Promise<T> {
     const querys = this.querys(query);
     const newItem = await this.createItem(params, data, querys);
-    if (this.items.findIndex(item => item?.getId() === newItem?.getId()) > 0) {
+    if (this._items.findIndex(item => item?.getId() === newItem?.getId()) > 0) {
       return newItem;
     }
-    const items = this.sortItems([...this.items, newItem]);
-    this.items.replace(items);
+    const items = this.sortItems([...this._items, newItem]);
+    this._items.replace(items);
     return newItem;
   }
 
   async apply(item: T, data?: Partial<T>, query?: IObjectApiQueryParams): Promise<T> {
     const querys = this.querys(query);
     if (
-      this.items.findIndex(
+      this._items.findIndex(
         item => {
           item.getId() == item.getId() && item.getNs() == item.getNs();
         }) > 0
@@ -106,10 +106,10 @@ export abstract class ObjectStore<T extends IObject = any> extends ItemStore<T> 
     // 从`api update`更新成功以后回写入`itemsStore item`
     const querys = this.querys(query);
     const newItem = await item.update(this, data, querys);
-    const index = this.items.findIndex(
+    const index = this._items.findIndex(
       item => item.getId() === newItem.getId()
     );
-    this.items.splice(index, 1, newItem);
+    this._items.splice(index, 1, newItem);
     return newItem;
   }
 
@@ -165,40 +165,45 @@ export abstract class ObjectStore<T extends IObject = any> extends ItemStore<T> 
     store.eventsBuffer.push(evt);
   }
 
+  @computed get items() {
+      return this._items;
+  }
+
   @action
   protected updateFromEventsBuffer() {
     if (!this.eventsBuffer.length) {
       return;
     }
     // create latest non-observable copy of items to apply updates in one action (==single render)
-    let items = this.items.slice();
-    this.eventsBuffer.clear().forEach(({ type, object }) => {
-      const { uid } = object;
-      const index = items.findIndex(item => item.getId() === uid);
-      const item = items[index];
-      switch (type) {
-        case 'ADDED':
-        case 'MODIFIED':
-          const newItem = new this.api.objectConstructor(object);
-          if (!item) {
-            items.push(newItem);
-          } else {
-            items.splice(index, 1, newItem);
-          }
-          break;
-        case 'DELETED':
-          if (item) {
-            items.splice(index, 1);
-          }
-          break;
-      }
-    });
+    let items = this._items.slice();
+    this.eventsBuffer.clear().forEach(
+      ({ type, object }) => {
+        const { uid } = object;
+        const index = items.findIndex(item => item.getId() === uid);
+        const item = items[index];
+        switch (type) {
+          case 'ADDED':
+          case 'MODIFIED':
+            const newItem = new this.api.objectConstructor(object);
+            if (!item) {
+              items.push(newItem);
+            } else {
+              items.splice(index, 1, newItem);
+            }
+            break;
+          case 'DELETED':
+            if (item) {
+              items.splice(index, 1);
+            }
+            break;
+        }
+      });
 
     // slice to max allowed items
     if (this.limit && this.limit != -1 && items.length > this.limit) {
       items = items.slice(-this.limit);
     }
     // update items
-    this.items.replace(this.sortItems(items));
+    this._items.replace(this.sortItems(items));
   }
 }
