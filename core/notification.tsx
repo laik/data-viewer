@@ -1,5 +1,5 @@
-// import Alert from '@mui/material/Alert';
-// import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 import isObject from 'lodash/isObject';
 import uniqueId from 'lodash/uniqueId';
 import { action, observable, reaction } from 'mobx';
@@ -135,20 +135,20 @@ export default class Notifications extends React.Component {
       <div>
         {notifications.map(notification => {
           return (
-            // <Snackbar
-            //   key={notification.id}
-            //   open={true}
-            //   autoHideDuration={notification.timeout}
-            // >
-            {/* <Alert
+            <Snackbar
+              key={notification.id}
+              open={true}
+              autoHideDuration={notification.timeout}
+            >
+              <Alert
                 severity={notification.status}
-                sx={{width: '100%'}}
+                sx={{ width: '100%' }}
                 elevation={6}
                 onClose={() => handleClose(notification.id)}
               >
                 {getMessage(notification)}
-              </Alert> */}
-            // </Snackbar>
+              </Alert>
+            </Snackbar>
           );
         })}
       </div>

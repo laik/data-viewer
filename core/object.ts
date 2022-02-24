@@ -11,7 +11,6 @@ export type IObjectConstructor<T extends IObject = any> = new (
 export class IObject implements ItemObject {
     static readonly kind: string;
     uid: string;
-    kind: string;
     version: string;
     ns?: string;
 

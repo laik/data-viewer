@@ -44,16 +44,16 @@ module.exports = withPlugins(plugins, {
       // ⚠️ api顺序最上层优先
       r = [
         {
-          source: "/user-login",
-          destination: `http://${cloudURL}/user-login`,
-        },
-        {
           source: "/watch",
           destination: `http://${cloudURL}/watch`,
         },
         {
-          source: "/wel/apis/:path*",
-          destination: `http://${cloudURL}/wel/apis/:path*`,
+          source: "/base/apis/:path*",
+          destination: `http://${cloudURL}/base/apis/:path*`,
+        },
+        {
+          source: "/aggregate/apis/:path*",
+          destination: `http://${cloudURL}/aggregate/apis/:path*`,
         },
       ];
     }

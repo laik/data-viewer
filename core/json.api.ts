@@ -9,7 +9,6 @@ import { EventEmitter } from './utils/emitter';
 
 export interface JsonApiData {
   uid: string;
-  kind: string;
   version: string;
   ns?: string;
 }

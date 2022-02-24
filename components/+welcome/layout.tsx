@@ -11,7 +11,7 @@ interface RouterProps {
 
 export interface WelcomeProps extends RouterProps { }
 @observer
-@storeables([bossStore], true) // 注入多个store，可以自动loadAll与watch数据
+@storeables([{ store: bossStore, iswatch: true }]) // 注入多个store，可以自动loadAll与watch数据
 export default class Welcome<P extends WelcomeProps> extends React.Component<P> {
 
     @observable static data: {} = {};
@@ -19,11 +19,11 @@ export default class Welcome<P extends WelcomeProps> extends React.Component<P> 
     defaultSortInfo: { name: string };
 
     @computed get v() {
-        return bossStore.items.length != 0 ? bossStore.items[0].version : '0';
+        return bossStore.items.length != 0 ? bossStore.items[0].vin : '0';
     }
 
     render() {
         const { name } = this.defaultSortInfo;
-        return (<div>{this.v}</div >)
+        return (<div>车牌：{this.v}</div>)
     }
 }
