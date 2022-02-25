@@ -122,6 +122,7 @@ export class ObjectWatchApi {
   }
 
   protected onMessage(evt: MessageEvent) {
+    console.log("on Message:", evt.data);
     if (!evt.data) return;
     let data = JSON.parse(evt.data);
     if (!this.onData) {
