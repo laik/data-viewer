@@ -33,6 +33,21 @@ const candlestickOption = {
 	],
 };
 
+export function createCandlestickOption(xAxis: [], yAxis: [], series: []): any {
+	return {
+		xAxis: {
+			data: xAxis,
+		},
+		yAxis: {},
+		series: [
+			{
+				type: 'candlestick',
+				data: series,
+			},
+		],
+	}
+}
+
 const electricityOption = {
 	title: {
 		text: 'Distribution of Electricity',

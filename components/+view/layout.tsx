@@ -1,16 +1,29 @@
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import React from 'react';
-import { storeables } from '../../core/store.wrap';
+import { ObjectStore } from '../../core';
+import { IStore, Store, storeables } from '../../core/store.wrap';
 import normal from '../../theme/normal.json';
-import { ChartMasonry, options } from '../charts';
+import { ChartMasonry } from '../charts';
 import { viewStore } from './store';
+
+
 
 @observer
 @storeables([{ store: viewStore, iswatch: true }])
-export default class View extends React.Component {
+export default class View<T extends ObjectStore<any>> extends React.Component implements IStore<T> {
+  stores: Store<T>[];
+
+  getStore(key: keyof T): T {
+    return this.stores.find(s => s.store.constructor.name === key).store;
+  }
+
   @computed get options() {
-    return options;
+    const items = viewStore.items;
+    if (items.length == 0) {
+      return [];
+    }
+    return [items[0].candlestick()];
   }
 
   render() {

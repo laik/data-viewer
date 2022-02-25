@@ -4,7 +4,8 @@ import { JsonApiData } from "./json.api";
 import { bind, noop } from './utils';
 
 export interface ItemObject extends JsonApiData {
-    getId()
+    getId(): string
+    getNs(): string
 }
 
 @bind()

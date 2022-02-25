@@ -3,7 +3,6 @@ import { action, computed, observable, reaction } from 'mobx';
 import { ItemStore } from './item.store';
 import { IObject } from './object';
 import { IObjectApiQueryParams, ObjectApi } from './object.api';
-import { ObjectJsonApiData } from './object.json.api';
 import { IObjectWatchEvent, objectWatchApi } from './object.watch.api';
 import { redux_userconfig } from './redux.store';
 import { bind } from './utils/bind';
@@ -18,7 +17,7 @@ export interface IObjectStoreParams {
 type NoopCB = () => void;
 
 @bind()
-export abstract class ObjectStore<T extends IObject = any> extends ItemStore<T> {
+export abstract class ObjectStore<T extends IObject> extends ItemStore<T> {
   abstract api: ObjectApi<T>;
   public limit: number = -1;
 
@@ -61,7 +60,7 @@ export abstract class ObjectStore<T extends IObject = any> extends ItemStore<T> 
       items = await this.loadItems()
     } catch (e) {
     } finally {
-      if (this._items) {
+      if (this.items) {
         this._items.replace(items);
       }
       this.isLoaded = true
@@ -134,7 +133,7 @@ export abstract class ObjectStore<T extends IObject = any> extends ItemStore<T> 
   }
 
   // collect items from watch-api events to avoid UI blowing up with huge streams of data
-  protected eventsBuffer = observable<IObjectWatchEvent<ObjectJsonApiData>>(
+  protected eventsBuffer = observable<IObjectWatchEvent<IObject>>(
     [],
     {
       deep: false,
@@ -166,7 +165,7 @@ export abstract class ObjectStore<T extends IObject = any> extends ItemStore<T> 
   }
 
   @computed get items() {
-      return this._items;
+    return this._items.slice();
   }
 
   @action
@@ -176,28 +175,27 @@ export abstract class ObjectStore<T extends IObject = any> extends ItemStore<T> 
     }
     // create latest non-observable copy of items to apply updates in one action (==single render)
     let items = this._items.slice();
-    this.eventsBuffer.clear().forEach(
-      ({ type, object }) => {
-        const { uid } = object;
-        const index = items.findIndex(item => item.getId() === uid);
-        const item = items[index];
-        switch (type) {
-          case 'ADDED':
-          case 'MODIFIED':
-            const newItem = new this.api.objectConstructor(object);
-            if (!item) {
-              items.push(newItem);
-            } else {
-              items.splice(index, 1, newItem);
-            }
-            break;
-          case 'DELETED':
-            if (item) {
-              items.splice(index, 1);
-            }
-            break;
-        }
-      });
+    this.eventsBuffer.clear().forEach(({ type, object }) => {
+      const { uid, kind } = object;
+      const index = items.findIndex(item => item.getId() === uid && item.kind === kind);
+      const item = items[index];
+      switch (type) {
+        case 'ADDED':
+        case 'MODIFIED':
+          const newItem = new this.api.objectConstructor(object);
+          if (!item) {
+            items.push(newItem);
+          } else {
+            items.splice(index, 1, newItem);
+          }
+          break;
+        case 'DELETED':
+          if (item) {
+            items.splice(index, 1);
+          }
+          break;
+      }
+    });
 
     // slice to max allowed items
     if (this.limit && this.limit != -1 && items.length > this.limit) {

@@ -2,7 +2,7 @@
   "name": "bossview",
   "private": true,
   "scripts": {
-    "dev": "NODE_ENV='development' next dev",
+    "dev": "NODE_ENV='development' next dev -p 0.0.0.0:3000",
     "windows": "cross-env NODE_OPTIONS='development' next dev",
     "build": "next build",
     "start": "next start",

@@ -8,11 +8,23 @@ export type IObjectConstructor<T extends IObject = any> = new (
 ) => T & { kind?: string };
 
 
+export function Kind<T = Object | Function>(f: T): string {
+    switch (typeof f) {
+        case "object":
+            return f.constructor.name;
+        case "function":
+            return f.name;
+    }
+}
 export class IObject implements ItemObject {
-    static readonly kind: string;
     uid: string;
+    kind: string;
     version: string;
-    ns?: string;
+    ns: string;
+
+    constructor(data: ObjectJsonApiData) {
+        Object.assign(this, data);
+    }
 
     static isJsonApiData(data: any): data is ObjectJsonApiData {
         return !data && data.uid && data.kind && data.version;
@@ -25,7 +37,7 @@ export class IObject implements ItemObject {
     getId(): string { return this.uid; }
     getNs(): string { return this.ns; }
 
-    async update<S extends ObjectStore, T extends IObject>(store: S, data: Partial<T>, query?: IObjectApiQueryParams) {
+    async update<S extends ObjectStore<T>, T extends IObject>(store: S, data: Partial<T>, query?: IObjectApiQueryParams) {
         return store.api.update(
             { id: this.getId(), ns: this.getNs() },
             data,

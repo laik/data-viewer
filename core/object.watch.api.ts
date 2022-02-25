@@ -2,7 +2,7 @@ import { computed, observable, reaction } from 'mobx';
 import { stringify } from 'querystring';
 import { apiManager } from './api.manager';
 import { EventSourcePolyfill as EventSource } from './eventsource/eventsource';
-import { JsonApiData, ObjectStore } from './index';
+import { IObject, ObjectStore } from './index';
 import { ObjectApi } from './object.api';
 import { redux_userconfig } from './redux.store';
 import { UserConfig } from './user.config';
@@ -11,10 +11,10 @@ import { bind, EventEmitter, interval } from './utils';
 export interface IWatchRouteQuery {
   api: string | string[];
 }
-export interface IObjectWatchEvent<T extends Object = any> {
+export interface IObjectWatchEvent<T extends IObject = any> {
   type: 'ADDED' | 'MODIFIED' | 'DELETED';
   object?: T;
-  store?: ObjectStore;
+  store?: ObjectStore<T>;
 }
 export interface IObjectWatchRouteEvent {
   type: string;
@@ -122,14 +122,12 @@ export class ObjectWatchApi {
   }
 
   protected onMessage(evt: MessageEvent) {
-    console.log("on message", evt);
     if (!evt.data) return;
     let data = JSON.parse(evt.data);
     if (!this.onData) {
       return;
     }
     if ((data as IObjectWatchEvent).object) {
-      console.log("onMessage--->:", evt.data);
       this.onData.emit(data);
     } else {
       if (typeof this.onRouteEvent === 'function') {
@@ -176,8 +174,8 @@ export class ObjectWatchApi {
     console.log('%cOBJECT-WATCH-API:', `font-weight: bold`, ...data);
   }
 
-  addListener<T extends ObjectStore>(store: T, ecb: EventCallback) {
-    const listener = (evt: IObjectWatchEvent<JsonApiData>) => {
+  addListener<T extends ObjectStore<IObject>>(store: T, ecb: EventCallback) {
+    const listener = (evt: IObjectWatchEvent<IObject>) => {
       const { ns, version } = evt.object;
       store.api.setVersion(ns || '', version);
       const evtKind = evt.object?.kind || '';

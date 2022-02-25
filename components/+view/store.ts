@@ -1,19 +1,26 @@
-import { ObjectApi, ObjectStore } from '../../core';
+import { IObject, ObjectApi, ObjectStore } from '../../core';
 import { apiManager } from '../../core/api.manager';
-import { Base } from '../../core/resource';
+import { Kind } from '../../core/object';
+import { bind } from '../../core/utils';
 import { baseApi } from '../api';
+import { createCandlestickOption } from '../charts/options';
 
-export class View extends Base {
-    options: any;
 
-    constructor(data: any) {
-        super()
-        Object.assign(this, data);
+@bind()
+export class View extends IObject {
+    options: {
+        xAxis: [];
+        yAxis: [];
+        data: [];
+    };
+
+    candlestick() {
+        return createCandlestickOption(this.options.xAxis, this.options.yAxis, this.options.data);
     }
 }
 
 export const viewApi = new ObjectApi({
-    kind: View.kind,
+    kind: Kind(View),
     isNs: false,
     apiBase: '/apis/ddx2x.nip/v1/view',
     objectConstructor: View,
