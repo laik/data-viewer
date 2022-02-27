@@ -23,7 +23,7 @@ export default class Welcome<P extends WelcomeProps> extends React.Component<P> 
     }
 
     render() {
-        const { name } = this.defaultSortInfo;
+        // const { name } = this.defaultSortInfo;
         return (<div>车牌：{this.v}</div>)
     }
 }
