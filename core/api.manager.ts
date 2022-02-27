@@ -1,4 +1,5 @@
 import { observable } from 'mobx';
+import { IObject } from './object';
 import { IObjectApiLinkRef, ObjectApi } from './object.api';
 import { ObjectStore } from './object.store';
 import { bind } from './utils';
@@ -24,10 +25,10 @@ export interface ApiComponents {
 }
 
 @bind()
-export class ApiManager {
+export class ApiManager<T extends IObject = any> {
   private apis = observable.map<string, ObjectApi>();
-  private stores = observable.map<ObjectApi, ObjectStore>();
-  private apiStores = observable.map<string, ObjectStore>();
+  private stores = observable.map<ObjectApi, ObjectStore<T>>();
+  private apiStores = observable.map<string, ObjectStore<T>>();
   private views = observable.map<ObjectApi, ApiComponents>();
 
   getApi(pathOrCallback: string | ((api: ObjectApi) => boolean)) {
@@ -63,13 +64,13 @@ export class ApiManager {
     }
   }
 
-  registerStore(api: ObjectApi, store: ObjectStore) {
+  registerStore(api: ObjectApi, store: ObjectStore<T>) {
     this.registerApi(api.apiBase, api);
     this.stores.set(api, store);
     this.apiStores.set(api.apiResource, store);
   }
 
-  getStore(api: ObjectApi | string, onlyStores?: boolean): ObjectStore {
+  getStore(api: ObjectApi | string, onlyStores?: boolean): ObjectStore<T> {
     if (onlyStores && typeof api === 'string') {
       return this.stores.get(this.resolveApi(api));
     }
@@ -79,7 +80,7 @@ export class ApiManager {
     return this.stores.get(api);
   }
 
-  getStores(apis: string[]): ObjectStore[] {
+  getStores(apis: string[]): ObjectStore<T>[] {
     return apis.map(api => this.getStore(api));
   }
 
