@@ -24,7 +24,7 @@ export function ChartMasonry({ options, theme }) {
   });
 
   return (
-    <Masonry columns={2} spacing={2}>
+    <Masonry columns={3} spacing={0}>
       {divs.map(item => item)}
     </Masonry>
   );

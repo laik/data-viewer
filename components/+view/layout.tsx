@@ -23,7 +23,7 @@ export default class View<T extends ObjectStore<any>> extends React.Component im
     if (items.length == 0) {
       return [];
     }
-    return [items[0].candlestick()];
+    return viewStore.candlesticks();
   }
 
   render() {

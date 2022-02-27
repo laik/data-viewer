@@ -33,6 +33,12 @@ export class ViewStore extends ObjectStore<View> {
         super();
         this.api = api;
     }
+
+    candlesticks() {
+        return this.items.map(item =>
+            createCandlestickOption(item.options.xAxis, item.options.yAxis, item.options.data)
+        ) || []
+    }
 }
 
 export const viewStore = new ViewStore(viewApi);
