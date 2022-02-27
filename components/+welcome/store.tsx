@@ -5,10 +5,11 @@ import { baseApi } from '../api';
 
 export class Boss extends Base {
     vin: string;
+    static kind: string;
 
-    constructor(data: any) {
-        super()
-        Object.assign(this, data);
+    constructor(props: any) {
+        super(props)
+        Object.assign(this, props);
     }
 }
 
