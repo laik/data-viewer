@@ -16,7 +16,7 @@ export class Boss extends Base {
 export const bossApi = new ObjectApi({
     kind: Boss.kind,
     isNs: false,
-    apiBase: '/apis/ddx2x.nip/v1/boss',
+    apiBase: '/apis/base.dataview.ym/v1/boss',
     objectConstructor: Boss,
     request: baseApi,
 });

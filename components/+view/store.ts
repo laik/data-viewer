@@ -22,7 +22,7 @@ export class View extends IObject {
 export const viewApi = new ObjectApi({
     kind: Kind(View),
     isNs: false,
-    apiBase: '/apis/ddx2x.nip/v1/view',
+    apiBase: '/apis/base.dataview.ym/v1/view',
     objectConstructor: View,
     request: baseApi,
 });
