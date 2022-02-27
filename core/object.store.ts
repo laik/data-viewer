@@ -140,7 +140,7 @@ export abstract class ObjectStore<T extends IObject> extends ItemStore<T> {
     }
   );
 
-  protected bindWatchEventsUpdater(delay = 100) {
+  protected bindWatchEventsUpdater(delay = 1000) {
     return reaction(
       () => this.eventsBuffer.slice()[0],
       this.updateFromEventsBuffer,

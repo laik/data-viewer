@@ -19,9 +19,11 @@ export default class View<T extends ObjectStore<any>> extends React.Component im
   }
 
   @computed get options() {
-    const options = viewStore.candlesticks();
-    console.log("options---->", options);
-    return options;
+    const items = viewStore.items;
+    if (items.length == 0) {
+      return [];
+    }
+    return [items[0].candlestick()];
   }
 
   render() {
