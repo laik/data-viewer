@@ -27,4 +27,5 @@ export function BMapMapvglLayer(props: MapvglLayerProps) {
 
 BMapMapvglLayer.defaultProps = {
 	map: null,
+	view: null,
 };
