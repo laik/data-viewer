@@ -449,7 +449,7 @@
 
 "@types/bmapgl@^0.0.5":
   version "0.0.5"
-  resolved "https://registry.npmjs.org/@types/bmapgl/-/bmapgl-0.0.5.tgz"
+  resolved "https://registry.npmjs.org/@types/bmapgl/-/bmapgl-0.0.5.tgz#daa92dcd501464b119c4bbfc22f9083f112d6c18"
   integrity sha512-4LVndgKRKLT4OIgUENDb9Uf9CsT2FtIMvpfKxIQVerEYPEXlunof60qDJQb/+1bg78crv7QJiz71tfh6NfpHbg==
 
 "@types/crypto-js@^4.1.0":
