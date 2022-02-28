@@ -4,7 +4,7 @@ import Document, { Head, Html, Main, NextScript } from 'next/document';
 import * as React from 'react';
 
 function createEmotionCache() {
-  return createCache({key: 'css'});
+  return createCache({ key: 'css' });
 }
 
 export default class MyDocument extends Document {
@@ -22,6 +22,9 @@ export default class MyDocument extends Document {
             rel='stylesheet'
             href='https://fonts.googleapis.com/icon?family=Material+Icons+Outlined'
           />
+          {/* <link type="stylesheet"
+            href="//api.map.baidu.com/api?type=webgl&v=1.0&ak=l1i69UZi7aKCrzchRYRvPuUUQSvupFYO">
+          </link> */}
         </Head>
         <body>
           <Main />
@@ -62,7 +65,7 @@ MyDocument.getInitialProps = async ctx => {
   // You can consider sharing the same emotion cache between all the SSR requests to speed up performance.
   // However, be aware that it can have global side effects.
   const cache = createEmotionCache();
-  const {extractCriticalToChunks} = createEmotionServer(cache);
+  const { extractCriticalToChunks } = createEmotionServer(cache);
 
   ctx.renderPage = () =>
     originalRenderPage({
@@ -80,7 +83,7 @@ MyDocument.getInitialProps = async ctx => {
       data-emotion={`${style.key} ${style.ids.join(' ')}`}
       key={style.key}
       // eslint-disable-next-line react/no-danger
-      dangerouslySetInnerHTML={{__html: style.css}}
+      dangerouslySetInnerHTML={{ __html: style.css }}
     />
   ));
 
