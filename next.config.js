@@ -16,6 +16,7 @@ const plugins = [withTM];
 
 module.exports = withPlugins(plugins, {
   // swcMinify: true,
+  // trailingSlash: true,
   productionBrowserSourceMaps: false,
   httpAgentOptions: {
     keepAlive: false,

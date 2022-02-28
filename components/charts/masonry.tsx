@@ -3,7 +3,6 @@ import * as echarts from 'echarts';
 import { useEffect } from 'react';
 
 export const ChartId = 'chart-masonry-'
-
 export function ChartMasonry({ options, theme }) {
   let divs = [];
 
