@@ -1,8 +1,8 @@
 import React from 'react';
 import { BaiduMap } from '../bmap';
-import { BMapPrism } from '../bmap/overlay';
-import { BMapMapvglLayer, BMapMapvglView } from '../bmap/vgl';
+import { BMapMapvglView } from '../bmap/vgl';
 import rs from './chinalocation.json';
+
 export default class Layout extends React.Component {
     componentDidMount() { }
     render() {
@@ -48,10 +48,14 @@ export default class Layout extends React.Component {
             });
         }
 
+
         return (
-            <BaiduMap mapTypeControl={false} navigationControl={false}>
+            <BaiduMap
+            // mapTypeControl={false} 
+            // navigationControl={false}
+            >
                 <BMapMapvglView effects={['bright']}>
-                    <BMapMapvglLayer
+                    {/* <BMapMapvglLayer
                         type='RippleLayer'
                         data={data1}
                         options={{
@@ -82,23 +86,23 @@ export default class Layout extends React.Component {
                         }}
                     />
 
-							<BMapMapvglLayer
-								type='FanLayer'
-								data={[
-									{
-										geometry: {
-											type: 'Point',
-											coordinates: [116.392394, 39.910683],
-										},
-									},
-								]}
-								options={{
-									color: 'rgba(50, 50, 200, 1)',
-									radius: 100,
-									size: 400000,
-								}}
-							/>
-							{/* <BMapMapvglLayer
+                    <BMapMapvglLayer
+                        type='FanLayer'
+                        data={[
+                            {
+                                geometry: {
+                                    type: 'Point',
+                                    coordinates: [116.392394, 39.910683],
+                                },
+                            },
+                        ]}
+                        options={{
+                            color: 'rgba(50, 50, 200, 1)',
+                            radius: 100,
+                            size: 400000,
+                        }}
+                    /> */}
+                    {/* <BMapMapvglLayer
                         type='TripLayer'
                         data={data3}
                         options={{
@@ -113,18 +117,19 @@ export default class Layout extends React.Component {
                             size: 5
                         }}
                     /> */}
-						</BMapMapvglView>
-						<BMapPrism
-							points={[]}
-							altitude={5000}
-							options={{
-								topFillColor: '#5679ea',
-								topFillOpacity: 0.6,
-								sideFillColor: '#5679ea',
-								sideFillOpacity: 0.9,
-							}}
-						/>
-					</BaiduMap>
-				);
+                </BMapMapvglView>
+
+                {/* <BMapPrism
+                    points={path}
+                    altitude={5000}
+                    options={{
+                        topFillColor: '#5679ea',
+                        topFillOpacity: 0.6,
+                        sideFillColor: '#5679ea',
+                        sideFillOpacity: 0.9,
+                    }}
+                /> */}
+            </BaiduMap>
+        );
     }
 }

@@ -1,5 +1,6 @@
 import Graphy, { GraphyProps } from 'react-bmapgl/Overlay/Graphy';
 
+
 export interface PrismProps extends GraphyProps {
 	/** 底面坐标数组 */
 	points: BMapGL.Point[];
@@ -7,6 +8,10 @@ export interface PrismProps extends GraphyProps {
 	altitude: number;
 	/** 棱柱样式自定义配置，可选 */
 	options?: BMapGL.PrismOptions;
+	/** 添加监听事件处理*/
+	listeners?: {
+		[event: string]: (evt: string, callback: (...args: any[]) => void) => void;
+	};
 }
 
 /**
@@ -21,7 +26,11 @@ export class Prism extends Graphy<PrismProps> {
 
 	getOverlay() {
 		const { points, altitude, options } = this.props;
-		return new BMapGL.Prism(points, altitude, options);
+		let prism = new BMapGL.Prism(points, altitude, options);
+		for (let [evt, cb] of Object.entries(this.props.listeners)) {
+			prism.addEventListener(evt, cb);
+		}
+		return prism;
 	}
 
 	render() {
