@@ -29,6 +29,9 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 	static defaultProps = {};
 	@observable mapRef = null;
 
+	handleMapClick = (e) => {
+		console.log(e);
+	}
 	render() {
 		const {
 			mapTypeControl,
@@ -45,11 +48,15 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 
 		return (
 			<Map
-				center={new BMapGL.Point(116.404449, 39.914889)}
+				center={'广州市'}
+				mapStyleV2={{ styleId: '919400316f7eba43636f9e4dfcd71d51' }}
+				zoom={25}
 				ref={(ref) => {
-					this.mapRef = ref.map;
+					// ref ? this.mapRef = ref.map : null;
 				}}
+				onClick={this.handleMapClick}
 				{...mapProps}>
+					
 				{mapTypeControl ? (
 					<MapTypeControl map={this.mapRef} {...mapTypeControlProps} />
 				) : null}
@@ -65,8 +72,8 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 				{children
 					? Array.isArray(children)
 						? children.map((child) =>
-								React.cloneElement(child, { map: this.mapRef })
-						  )
+							React.cloneElement(child, { map: this.mapRef })
+						)
 						: React.cloneElement(children, { map: this.mapRef })
 					: null}
 			</Map>

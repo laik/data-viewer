@@ -47,8 +47,9 @@ export default class Layout extends React.Component {
             });
         }
 
+        // var prism = BMapGL.Prism(points, altitude, options);
         return (
-            <BaiduMap>
+            <BaiduMap mapTypeControl={false} navigationControl={false}>
                 <BMapMapvglView effects={['bright']}>
                     <BMapMapvglLayer
                         type='RippleLayer'
@@ -81,35 +82,6 @@ export default class Layout extends React.Component {
                         }}
                     />
 
-                    <BMapMapvglLayer
-                        type='FanLayer'
-                        data={[{
-                            geometry: {
-                                type: 'Point',
-                                coordinates: [116.392394, 39.910683]
-                            }
-                        }]}
-                        options={{
-                            color: 'rgba(50, 50, 200, 1)',
-                            radius: 100,
-                            size:400000,
-                        }}
-                    />
-                    {/* <BMapMapvglLayer
-                        type='TripLayer'
-                        data={data3}
-                        options={{
-                            blend: 'lighter',
-                            shape: 'circle',
-                            startTime: 0,
-                            endTime: 500,
-                            step: 10,
-                            trailLength: 100,
-                            color: 'rgba(255, 77, 77, 0.8)', // 点动画图层颜色
-                            data: data1,
-                            size: 5
-                        }}
-                    /> */}
                 </BMapMapvglView>
             </BaiduMap>
         );
