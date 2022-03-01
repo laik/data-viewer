@@ -1,5 +1,6 @@
 import React from 'react';
 import { BaiduMap } from '../bmap';
+import { BMapPrism } from '../bmap/overlay';
 import { BMapMapvglLayer, BMapMapvglView } from '../bmap/vgl';
 import rs from './chinalocation.json';
 export default class Layout extends React.Component {
@@ -48,54 +49,56 @@ export default class Layout extends React.Component {
         }
 
         return (
-            <BaiduMap>
-                <BMapMapvglView effects={['bright']}>
-                    <BMapMapvglLayer
-                        type='RippleLayer'
-                        data={data1}
-                        options={{
-                            blend: 'wave',
-                            radius: 100,
-                            size: 5,
-                            color: 'rgba(255, 77, 77, 0.8)',
-                        }}
-                    />
-                    <BMapMapvglLayer
-                        type='RippleLayer'
-                        data={data2}
-                        options={{
-                            blend: 'wave',
-                            radius: 100,
-                            size: 5,
-                            color: 'rgba(255, 204, 0, 0.6)',
-                        }}
-                    />
-                    <BMapMapvglLayer
-                        type='RippleLayer'
-                        data={data3}
-                        options={{
-                            blend: 'wave',
-                            radius: 100,
-                            size: 5,
-                            color: 'rgba(255, 255, 0, 0.6)',
-                        }}
-                    />
+					<BaiduMap>
+						<BMapMapvglView effects={['bright']}>
+							<BMapMapvglLayer
+								type='RippleLayer'
+								data={data1}
+								options={{
+									blend: 'wave',
+									radius: 100,
+									size: 5,
+									color: 'rgba(255, 77, 77, 0.8)',
+								}}
+							/>
+							<BMapMapvglLayer
+								type='RippleLayer'
+								data={data2}
+								options={{
+									blend: 'wave',
+									radius: 100,
+									size: 5,
+									color: 'rgba(255, 204, 0, 0.6)',
+								}}
+							/>
+							<BMapMapvglLayer
+								type='RippleLayer'
+								data={data3}
+								options={{
+									blend: 'wave',
+									radius: 100,
+									size: 5,
+									color: 'rgba(255, 255, 0, 0.6)',
+								}}
+							/>
 
-                    <BMapMapvglLayer
-                        type='FanLayer'
-                        data={[{
-                            geometry: {
-                                type: 'Point',
-                                coordinates: [116.392394, 39.910683]
-                            }
-                        }]}
-                        options={{
-                            color: 'rgba(50, 50, 200, 1)',
-                            radius: 100,
-                            size:400000,
-                        }}
-                    />
-                    {/* <BMapMapvglLayer
+							<BMapMapvglLayer
+								type='FanLayer'
+								data={[
+									{
+										geometry: {
+											type: 'Point',
+											coordinates: [116.392394, 39.910683],
+										},
+									},
+								]}
+								options={{
+									color: 'rgba(50, 50, 200, 1)',
+									radius: 100,
+									size: 400000,
+								}}
+							/>
+							{/* <BMapMapvglLayer
                         type='TripLayer'
                         data={data3}
                         options={{
@@ -110,8 +113,18 @@ export default class Layout extends React.Component {
                             size: 5
                         }}
                     /> */}
-                </BMapMapvglView>
-            </BaiduMap>
-        );
+						</BMapMapvglView>
+						<BMapPrism
+							points={[]}
+							altitude={5000}
+							options={{
+								topFillColor: '#5679ea',
+								topFillOpacity: 0.6,
+								sideFillColor: '#5679ea',
+								sideFillOpacity: 0.9,
+							}}
+						/>
+					</BaiduMap>
+				);
     }
 }

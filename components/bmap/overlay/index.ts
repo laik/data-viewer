@@ -7,3 +7,4 @@ export * from './label';
 export * from './marker';
 export * from './polygon';
 export * from './polyline';
+export * from './prism';
