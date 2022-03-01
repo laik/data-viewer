@@ -9,8 +9,8 @@ const Maps2Layout = dynamic(
 
 export default function Home() {
     return (
-        <div style={{ minHeight: "1000px" }}>
+        // <div style={{ minHeight: "1000px" }}>
         <Maps2Layout />
-        </div>
+        // </div>
     );
 }
