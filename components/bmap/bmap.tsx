@@ -52,8 +52,10 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 		return (
 			<Map
 				center={'广州市'}
-				zoom={30}
-				// mapStyleV2={{ styleId: '00b4cbb970cc388d95e664915d263104' }}
+				zoom={12}
+				minZoom={12}
+				maxZoom={22}
+				mapStyleV2={{ styleId: '7e65c2caad216624f9c4a03e1f012b23' }}
 				style={{ width: '100%', height: '100%' }}
 
 				ref={(ref) => {
