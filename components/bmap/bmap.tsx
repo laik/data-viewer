@@ -55,21 +55,21 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 	gzPrism() {
 		let path = [];
 
-		// const bd = new BMapGL.Boundary();
-		// // @ts-ignore
-		// bd.get('天河区', function (rs: Results) {
-		// 	console.log("---->rs", rs)
-		// 	let count = rs.boundaries.length;
-		// 	for (let i = 0; i < count; i++) {
-		// 		let str = rs.boundaries[i].replace(' ', '');
-		// 		let points = str.split(';');
-		// 		for (let j = 0; j < points.length; j++) {
-		// 			let lng = points[j].split(',')[0];
-		// 			let lat = points[j].split(',')[1];
-		// 			path.push(new BMapGL.Point(Number(lng), Number(lat)));
-		// 		}
-		// 	}
-		// });
+		const bd = new BMapGL.Boundary();
+		// @ts-ignore
+		bd.get('天河区', function (rs: Results) {
+			console.log("---->rs", rs)
+			let count = rs.boundaries.length;
+			for (let i = 0; i < count; i++) {
+				let str = rs.boundaries[i].replace(' ', '');
+				let points = str.split(';');
+				for (let j = 0; j < points.length; j++) {
+					let lng = points[j].split(',')[0];
+					let lat = points[j].split(',')[1];
+					path.push(new BMapGL.Point(Number(lng), Number(lat)));
+				}
+			}
+		});
 
 		for (let i = 0; i < gz.length; i++) {
 			let str = gz[i].replace(' ', '');
@@ -83,11 +83,11 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 
 		return <BMapPrism
 			points={path}
-			altitude={5000}
+			altitude={2000}
 			options={{
-				topFillColor: '#ff0000',
-				topFillOpacity: 0.1,
-				sideFillColor: '#ff00ea',
+				topFillColor: '#ECF23B',
+				topFillOpacity: 0.2,
+				sideFillColor: '#ECF23B',
 				sideFillOpacity: 0.2,
 			}}
 			listeners={{ "click": this.handleClick }}
@@ -107,12 +107,12 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 
 		return <BMapPrism
 			points={path}
-			altitude={5000}
+			altitude={2000}
 			options={{
-				topFillColor: '#555555',
-				topFillOpacity: 0.6,
-				sideFillColor: '#5579ea',
-				sideFillOpacity: 0.6,
+				topFillColor: '#ECF23B',
+				topFillOpacity: 0.2,
+				sideFillColor: '##ECF23B',
+				sideFillOpacity: 0.2,
 			}}
 			listeners={{ "click": this.handleClick }}
 		/>
@@ -132,13 +132,12 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 			children,
 		} = this.props;
 
-
-		console.log("-------->path", BaiduMap.path);
 		return (
 			<Map
 				center={'广州市'}
 				mapStyleV2={{ styleId: '00b4cbb970cc388d95e664915d263104' }}
-				zoom={25}
+				style={{ width: '100%', height: '100%' }}
+
 				ref={(ref) => {
 					ref ? this.mapRef = ref.map : null;
 				}}

@@ -1,4 +1,5 @@
 import dynamic from "next/dynamic";
+import styles from "../styles/Home.module.css";
 
 const Maps2Layout = dynamic(
     () => {
@@ -9,8 +10,8 @@ const Maps2Layout = dynamic(
 
 export default function Home() {
     return (
-        // <div style={{ minHeight: "1000px" }}>
-        <Maps2Layout />
-        // </div>
+        < div className={styles.full} >
+            <Maps2Layout></Maps2Layout>
+        </div >
     );
 }
