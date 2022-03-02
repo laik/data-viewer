@@ -23,13 +23,7 @@ export interface BaiduMapProps {
 	scaleControlProps?: ControlProps;
 	zoomControlProps?: ControlProps;
 	children?: React.ReactElement[] | React.ReactElement;
-	handleMapClick?: () => void;
 }
-
-interface Results {
-	boundaries: string[];
-}
-
 @withMapApi
 @observer
 export class BaiduMap extends React.Component<BaiduMapProps> {
@@ -40,7 +34,6 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 	constructor(props) {
 		super(props);
 	}
-
 
 	render() {
 		const {
@@ -54,22 +47,20 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 			scaleControlProps,
 			zoomControlProps,
 			children,
-			handleMapClick,
 		} = this.props;
 
 		return (
 			<Map
 				center={'广州市'}
-				mapStyleV2={{ styleId: '00b4cbb970cc388d95e664915d263104' }}
+				zoom={30}
+				// mapStyleV2={{ styleId: '00b4cbb970cc388d95e664915d263104' }}
 				style={{ width: '100%', height: '100%' }}
 
 				ref={(ref) => {
 					ref ? this.mapRef = ref.map : null;
 				}}
 
-
 				{...mapProps}>
-
 
 				{mapTypeControl ? (
 					<MapTypeControl map={this.mapRef} {...mapTypeControlProps} />

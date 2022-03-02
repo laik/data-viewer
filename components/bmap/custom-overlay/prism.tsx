@@ -1,5 +1,11 @@
 import Graphy, { GraphyProps } from 'react-bmapgl/Overlay/Graphy';
 
+
+export enum PrismEvtType {
+	CLICK = 'click',
+	MOUSE_OVER = 'mouseover',
+	MOUSE_OUT = 'mouseout',
+}
 export interface PrismProps extends GraphyProps {
 	/** 底面坐标数组 */
 	points: BMapGL.Point[] | [number, number][];
@@ -43,8 +49,10 @@ export class Prism extends Graphy<PrismProps> {
 		const { altitude } = this.props;
 		const points = this.parsePoints(this.props.points);
 		let prism = new BMapGL.Prism(points, altitude, this.getOptions());
-		for (let [evt, cb] of Object.entries(this.props.listeners)) {
-			prism.addEventListener(evt, cb);
+		if (this.props.listeners) {
+			for (let [evt, cb] of Object.entries(this.props.listeners)) {
+				prism.addEventListener(evt, cb);
+			}
 		}
 		return prism;
 	}

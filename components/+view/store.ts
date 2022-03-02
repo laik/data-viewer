@@ -13,7 +13,6 @@ export class View extends IObject {
         yAxis: [];
         data: [];
     };
-
     candlestick() {
         return createCandlestickOption(this.options.xAxis, this.options.yAxis, this.options.data);
     }
