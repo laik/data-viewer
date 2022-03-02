@@ -7,7 +7,6 @@ import NavigationControl from 'react-bmapgl/Control/NavigationControl';
 import ScaleControl from 'react-bmapgl/Control/ScaleControl';
 import ZoomControl from 'react-bmapgl/Control/ZoomControl';
 import Map, { MapProps } from 'react-bmapgl/Map';
-import { withMapApi } from './wrapper';
 
 // 百度地图图层组件
 export interface BaiduMapProps {
@@ -21,13 +20,15 @@ export interface BaiduMapProps {
 	scaleControlProps?: ControlProps;
 	zoomControlProps?: ControlProps;
 	children?: React.ReactElement[] | React.ReactElement;
+	handleMapClick?: () => void;
 }
 
-@withMapApi
 @observer
 export class BaiduMap extends React.Component<BaiduMapProps> {
 	static defaultProps = {};
 	@observable mapRef = null;
+
+	handleMapClick = (e) => {};
 
 	render() {
 		const {
@@ -41,14 +42,16 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 			scaleControlProps,
 			zoomControlProps,
 			children,
+			handleMapClick,
 		} = this.props;
 
 		return (
 			<Map
-				center={new BMapGL.Point(116.404449, 39.914889)}
+				center={new BMapGL.Point(116.404, 39.925)}
 				ref={(ref) => {
-					this.mapRef = ref.map;
+					ref ? (this.mapRef = ref.map) : null;
 				}}
+				onClick={handleMapClick}
 				{...mapProps}>
 				{mapTypeControl ? (
 					<MapTypeControl map={this.mapRef} {...mapTypeControlProps} />
@@ -80,8 +83,8 @@ BaiduMap.defaultProps = {
 	scaleControl: true,
 	zoomControl: true,
 	mapProps: {
-		zoom: 12,
-		tilt: 40,
+		zoom: 9,
+		tilt: 50,
 	},
 	mapTypeControlProps: {},
 	navigationControlProps: {},
