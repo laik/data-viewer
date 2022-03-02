@@ -1,20 +1,19 @@
 import React from 'react';
 import { BaiduMap } from '../bmap';
+import { BMapTrackAnimation } from '../bmap/animation';
 import { BMapPrism } from '../bmap/custom-overlay';
 // import { BMapPrism } from '../bmap/custom-overlay';
 import { BMapMapvglLayer, BMapMapvglView } from '../bmap/vgl';
 import { withMapApi } from '../bmap/wrapper';
-import line139 from './data/139line.json';
+import line139Path from './data/139line.json';
 import hp from './data/hp.json';
 import lw from './data/lw.json';
 
 @withMapApi
 export default class Layout extends React.Component {
-
     handleBMapPrismClick(e) {
-        console.log("---->e", e.target);
+        console.log('---->e', e.target);
     }
-
     convert(src: number[][]): any {
         let paths = [];
         for (let i = 0; i < src.length; i++) {
@@ -42,15 +41,9 @@ export default class Layout extends React.Component {
             hppath.push(new BMapGL.Point(Number(lng), Number(lat)));
         }
 
-        let line139Path = [];
-        for (let i = 0; i < line139.length; i++) {
-            const points = line139[i];
-            let lng = points[0];
-            let lat = points[1];
-            line139Path.push([lng, lat]);
-        }
 
 
+        var pl = new BMapGL.Polyline(hppath);
         return (
             <BaiduMap>
                 <BMapMapvglView effects={['bright']}>
@@ -85,7 +78,7 @@ export default class Layout extends React.Component {
                                 coordinates: [...line139Path]
                             }
                         }]} />
-{/* 
+                    {/* 
                     <BMapMapvglLayer
                         type='MaskLayer'
                         options={{
@@ -122,6 +115,14 @@ export default class Layout extends React.Component {
                     sideFillOpacity={0.9}
                     enableMassClear={true}
                     listeners={{ "click": this.handleBMapPrismClick }}
+                />
+
+                <BMapTrackAnimation
+                    poyline={pl}
+                    overallView={true}
+                    tilt={30}
+                    duration={20000}
+                    delay={3000}
                 />
 
             </BaiduMap>
