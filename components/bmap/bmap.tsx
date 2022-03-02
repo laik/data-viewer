@@ -7,6 +7,9 @@ import NavigationControl from 'react-bmapgl/Control/NavigationControl';
 import ScaleControl from 'react-bmapgl/Control/ScaleControl';
 import ZoomControl from 'react-bmapgl/Control/ZoomControl';
 import Map, { MapProps } from 'react-bmapgl/Map';
+import { withMapApi } from './wrapper';
+
+
 
 // 百度地图图层组件
 export interface BaiduMapProps {
@@ -20,15 +23,17 @@ export interface BaiduMapProps {
 	scaleControlProps?: ControlProps;
 	zoomControlProps?: ControlProps;
 	children?: React.ReactElement[] | React.ReactElement;
-	handleMapClick?: () => void;
 }
-
+@withMapApi
 @observer
 export class BaiduMap extends React.Component<BaiduMapProps> {
 	static defaultProps = {};
 	@observable mapRef = null;
+	static path = [];
 
-	handleMapClick = (e) => {};
+	constructor(props) {
+		super(props);
+	}
 
 	render() {
 		const {
@@ -42,17 +47,21 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 			scaleControlProps,
 			zoomControlProps,
 			children,
-			handleMapClick,
 		} = this.props;
 
 		return (
 			<Map
-				center={new BMapGL.Point(116.404, 39.925)}
+				center={'广州市'}
+				zoom={30}
+				// mapStyleV2={{ styleId: '00b4cbb970cc388d95e664915d263104' }}
+				style={{ width: '100%', height: '100%' }}
+
 				ref={(ref) => {
-					ref ? (this.mapRef = ref.map) : null;
+					ref ? this.mapRef = ref.map : null;
 				}}
-				onClick={handleMapClick}
+
 				{...mapProps}>
+
 				{mapTypeControl ? (
 					<MapTypeControl map={this.mapRef} {...mapTypeControlProps} />
 				) : null}
@@ -68,8 +77,8 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 				{children
 					? Array.isArray(children)
 						? children.map((child) =>
-								React.cloneElement(child, { map: this.mapRef })
-						  )
+							React.cloneElement(child, { map: this.mapRef })
+						)
 						: React.cloneElement(children, { map: this.mapRef })
 					: null}
 			</Map>
