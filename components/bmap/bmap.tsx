@@ -7,9 +7,6 @@ import NavigationControl from 'react-bmapgl/Control/NavigationControl';
 import ScaleControl from 'react-bmapgl/Control/ScaleControl';
 import ZoomControl from 'react-bmapgl/Control/ZoomControl';
 import Map, { MapProps } from 'react-bmapgl/Map';
-import gz from './gz.json';
-import { BMapPrism } from './overlay';
-import th from './th.json';
 import { withMapApi } from './wrapper';
 
 
@@ -26,6 +23,7 @@ export interface BaiduMapProps {
 	scaleControlProps?: ControlProps;
 	zoomControlProps?: ControlProps;
 	children?: React.ReactElement[] | React.ReactElement;
+	handleMapClick?: () => void;
 }
 
 interface Results {
@@ -43,80 +41,6 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 		super(props);
 	}
 
-	handleMapClick = (e) => {
-		console.log(e);
-	}
-
-
-	handleClick(e) {
-		console.log("---->e", e.target);
-	}
-
-	gzPrism() {
-		let path = [];
-
-		const bd = new BMapGL.Boundary();
-		// @ts-ignore
-		bd.get('天河区', function (rs: Results) {
-			console.log("---->rs", rs)
-			let count = rs.boundaries.length;
-			for (let i = 0; i < count; i++) {
-				let str = rs.boundaries[i].replace(' ', '');
-				let points = str.split(';');
-				for (let j = 0; j < points.length; j++) {
-					let lng = points[j].split(',')[0];
-					let lat = points[j].split(',')[1];
-					path.push(new BMapGL.Point(Number(lng), Number(lat)));
-				}
-			}
-		});
-
-		for (let i = 0; i < gz.length; i++) {
-			let str = gz[i].replace(' ', '');
-			const points = str.split(';');
-			for (let j = 0; j < points.length; j++) {
-				let lng = points[j].split(',')[0];
-				let lat = points[j].split(',')[1];
-				path.push(new BMapGL.Point(Number(lng), Number(lat)));
-			}
-		}
-
-		return <BMapPrism
-			points={path}
-			altitude={2000}
-			options={{
-				topFillColor: '#ECF23B',
-				topFillOpacity: 0.2,
-				sideFillColor: '#ECF23B',
-				sideFillOpacity: 0.2,
-			}}
-			listeners={{ "click": this.handleClick }}
-		/>
-	}
-	thPrism() {
-		let path = [];
-		for (let i = 0; i < th.length; i++) {
-			let str = th[i].replace(' ', '');
-			const points = str.split(';');
-			for (let j = 0; j < points.length; j++) {
-				let lng = points[j].split(',')[0];
-				let lat = points[j].split(',')[1];
-				path.push(new BMapGL.Point(Number(lng), Number(lat)));
-			}
-		}
-
-		return <BMapPrism
-			points={path}
-			altitude={2000}
-			options={{
-				topFillColor: '#ECF23B',
-				topFillOpacity: 0.2,
-				sideFillColor: '##ECF23B',
-				sideFillOpacity: 0.2,
-			}}
-			listeners={{ "click": this.handleClick }}
-		/>
-	}
 
 	render() {
 		const {
@@ -130,6 +54,7 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 			scaleControlProps,
 			zoomControlProps,
 			children,
+			handleMapClick,
 		} = this.props;
 
 		return (
@@ -141,11 +66,10 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 				ref={(ref) => {
 					ref ? this.mapRef = ref.map : null;
 				}}
-				onClick={this.handleMapClick}
+
+
 				{...mapProps}>
 
-				{this.gzPrism()}
-				{this.thPrism()}
 
 				{mapTypeControl ? (
 					<MapTypeControl map={this.mapRef} {...mapTypeControlProps} />
@@ -177,8 +101,8 @@ BaiduMap.defaultProps = {
 	scaleControl: true,
 	zoomControl: true,
 	mapProps: {
-		zoom: 12,
-		tilt: 40,
+		zoom: 9,
+		tilt: 50,
 	},
 	mapTypeControlProps: {},
 	navigationControlProps: {},

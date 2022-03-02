@@ -1,135 +1,93 @@
 import React from 'react';
 import { BaiduMap } from '../bmap';
-import { BMapMapvglView } from '../bmap/vgl';
-import rs from './chinalocation.json';
+import { BMapPrism } from '../bmap/custom-overlay';
+import { withMapApi } from '../bmap/wrapper';
 
+@withMapApi
 export default class Layout extends React.Component {
-    componentDidMount() { }
-    render() {
 
-        var data1 = [];
-        var data2 = [];
-        var data3 = [];
-        for (var i = 0; i < rs[0].length; i++) {
-            var geoCoord = rs[0][i].geoCoord;
-            data1.push({
-                geometry: {
-                    type: 'Point',
-                    coordinates: geoCoord
-                },
-                properties: {
-                    time: Math.random() * 100
-                }
-            });
-        }
-        for (var i = 0; i < rs[1].length; i++) {
-            var geoCoord = rs[1][i].geoCoord;
-            data2.push({
-                geometry: {
-                    type: 'Point',
-                    coordinates: geoCoord
-                },
-                properties: {
-                    time: Math.random() * 10
-                }
-            });
-        }
-
-        for (var i = 0; i < rs[2].length; i++) {
-            var geoCoord = rs[2][i].geoCoord;
-            data3.push({
-                geometry: {
-                    type: 'Point',
-                    coordinates: geoCoord
-                },
-                properties: {
-                    time: Math.random() * 10
-                }
-            });
-        }
-
-
-        return (
-            <BaiduMap
-            // mapTypeControl={false} 
-            // navigationControl={false}
-            >
-                <BMapMapvglView effects={['bright']}>
-                    {/* <BMapMapvglLayer
-                        type='RippleLayer'
-                        data={data1}
-                        options={{
-                            blend: 'wave',
-                            radius: 100,
-                            size: 5,
-                            color: 'rgba(255, 77, 77, 0.8)',
-                        }}
-                    />
-                    <BMapMapvglLayer
-                        type='RippleLayer'
-                        data={data2}
-                        options={{
-                            blend: 'wave',
-                            radius: 100,
-                            size: 5,
-                            color: 'rgba(255, 204, 0, 0.6)',
-                        }}
-                    />
-                    <BMapMapvglLayer
-                        type='RippleLayer'
-                        data={data3}
-                        options={{
-                            blend: 'wave',
-                            radius: 100,
-                            size: 5,
-                            color: 'rgba(255, 255, 0, 0.6)',
-                        }}
-                    />
-
-                    <BMapMapvglLayer
-                        type='FanLayer'
-                        data={[
-                            {
-                                geometry: {
-                                    type: 'Point',
-                                    coordinates: [116.392394, 39.910683],
-                                },
-                            },
-                        ]}
-                        options={{
-                            color: 'rgba(50, 50, 200, 1)',
-                            radius: 100,
-                            size: 400000,
-                        }}
-                    /> */}
-                    {/* <BMapMapvglLayer
-                        type='TripLayer'
-                        data={data3}
-                        options={{
-                            blend: 'lighter',
-                            shape: 'circle',
-                            startTime: 0,
-                            endTime: 500,
-                            step: 10,
-                            trailLength: 100,
-                            color: 'rgba(255, 77, 77, 0.8)', // 点动画图层颜色
-                            data: data1,
-                            size: 5
-                        }}
-                    /> */}
-                </BMapMapvglView>
-
-                {/* <BMapPrism
-                    points={path}
-                    altitude={5000}
-                    options={{
-                        topFillColor: '#5679ea',
-                        topFillOpacity: 0.6,
-                        sideFillColor: '#5679ea',
-                        sideFillOpacity: 0.9,
-                    }}
-                /> */}
-            </BaiduMap>
-        );
+    handleClick(e) {
+        console.log("---->e", e.target);
     }
+
+    gzPrism() {
+        let path = [];
+
+        const bd = new BMapGL.Boundary();
+        // @ts-ignore
+        bd.get('天河区', function (rs: Results) {
+            console.log("---->rs", rs)
+            let count = rs.boundaries.length;
+            for (let i = 0; i < count; i++) {
+                let str = rs.boundaries[i].replace(' ', '');
+                let points = str.split(';');
+                for (let j = 0; j < points.length; j++) {
+                    let lng = points[j].split(',')[0];
+                    let lat = points[j].split(',')[1];
+                    path.push(new BMapGL.Point(Number(lng), Number(lat)));
+                }
+            }
+        });
+
+        for (let i = 0; i < gz.length; i++) {
+            let str = gz[i].replace(' ', '');
+            const points = str.split(';');
+            for (let j = 0; j < points.length; j++) {
+                let lng = points[j].split(',')[0];
+                let lat = points[j].split(',')[1];
+                path.push(new BMapGL.Point(Number(lng), Number(lat)));
+            }
+        }
+
+        return <BMapPrism
+            points={path}
+            altitude={2000}
+            options={{
+                topFillColor: '#ECF23B',
+                topFillOpacity: 0.2,
+                sideFillColor: '#ECF23B',
+                sideFillOpacity: 0.2,
+            }}
+            listeners={{ "click": this.handleClick }}
+        />
+    }
+    thPrism() {
+        let path = [];
+        for (let i = 0; i < th.length; i++) {
+            let str = th[i].replace(' ', '');
+            const points = str.split(';');
+            for (let j = 0; j < points.length; j++) {
+                let lng = points[j].split(',')[0];
+                let lat = points[j].split(',')[1];
+                path.push(new BMapGL.Point(Number(lng), Number(lat)));
+            }
+        }
+
+        return <BMapPrism
+            points={path}
+            altitude={2000}
+            options={{
+                topFillColor: '#ECF23B',
+                topFillOpacity: 0.2,
+                sideFillColor: '##ECF23B',
+                sideFillOpacity: 0.2,
+            }}
+            listeners={{ "click": this.handleClick }}
+        />
+    }
+
+	render() {
+		return (
+			<BaiduMap>
+				<BMapPrism
+					points={[]}
+					altitude={5000}
+					topFillColor={'#5679ea'}
+					topFillOpacity={0.6}
+					sideFillColor={'#5679ea'}
+					sideFillOpacity={0.9}
+				/>
+			</BaiduMap>
+		);
+	}
 }
