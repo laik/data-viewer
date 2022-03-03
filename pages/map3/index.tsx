@@ -1,9 +1,9 @@
 import dynamic from "next/dynamic";
-import styles from "../styles/Home.module.css";
+import styles from "../../styles/Home.module.css";
 
-const Maps2Layout = dynamic(
+const Maps3Layout = dynamic(
     () => {
-        return import("../components/+maps2/layout");
+        return import("../../components/+maps3/layout");
     },
     { ssr: false }
 );
@@ -11,7 +11,7 @@ const Maps2Layout = dynamic(
 export default function Home() {
     return (
         < div className={styles.full} >
-            <Maps2Layout></Maps2Layout>
+            <Maps3Layout></Maps3Layout>
         </div >
     );
 }
