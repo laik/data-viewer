@@ -1,3 +1,4 @@
+import { observable } from 'mobx';
 import React from 'react';
 import { BaiduMap } from '../bmap';
 import { BMapTrackAnimation } from '../bmap/animation';
@@ -8,8 +9,11 @@ import lw from './data/lw.json';
 
 @withMapApi
 export default class Layout extends React.Component {
+	@observable view = null;
+
 	handleBMapPrismClick(e) {
 		console.log('---->e', e.target);
+		console.log('---->view', this.view);
 	}
 
 	render() {
@@ -29,10 +33,9 @@ export default class Layout extends React.Component {
 		}
 
 		var pl = new BMapGL.Polyline(hppath);
-		// BMapTrackAnimation.start();
 
 		return (
-			<BaiduMap>
+			<BaiduMap useView onViewRef={(view) => (this.view = view)}>
 				<BMapPrism
 					points={lwpath}
 					altitude={3000}
