@@ -1849,12 +1849,7 @@ mapv@^2.0.56:
   dependencies:
     babel-plugin-external-helpers "^6.22.0"
 
-mapvgl@^1.0.0-beta.117, mapvgl@^1.0.0-beta.139:
-  version "1.0.0-beta.143"
-  resolved "https://registry.npmjs.org/mapvgl/-/mapvgl-1.0.0-beta.143.tgz"
-  integrity sha512-JeSCH6HZJ9IYPQ/xXNqe5SkqhYDXbEiTGKSsPWlHUFVmuYcO+5p74hawZqZC2/HLsjBDo/lROvOM3aUBEY4mmw==
-
-mapvgl@^1.0.0-beta.143:
+mapvgl@^1.0.0-beta.117, mapvgl@^1.0.0-beta.139, mapvgl@^1.0.0-beta.143:
   version "1.0.0-beta.143"
   resolved "https://registry.npmjs.org/mapvgl/-/mapvgl-1.0.0-beta.143.tgz#78532eb3be98aa01130679550389b4e04d71d59a"
   integrity sha512-JeSCH6HZJ9IYPQ/xXNqe5SkqhYDXbEiTGKSsPWlHUFVmuYcO+5p74hawZqZC2/HLsjBDo/lROvOM3aUBEY4mmw==
