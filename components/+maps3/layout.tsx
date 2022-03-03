@@ -30,6 +30,7 @@ export default class Layout extends React.Component {
         }
         return paths;
     }
+    
     convert2(src: number[][]): any {
         let paths = [];
         for (let i = 0; i < src.length; i++) {
@@ -47,9 +48,10 @@ export default class Layout extends React.Component {
 
     onClick(e) {
         console.log('---->e', e);
-        this.bmap.put(this.convert(lw), 200);
-        this.bmap.put(this.convert(hp), 200)
-
+        this.bmap.addOverlay(this.convert(lw), 200);
+        this.bmap.addOverlay(this.convert(hp), 200)
+        
+        
         this.bmap.addLayer({
             type: 'LineTripLayer',
             options: {

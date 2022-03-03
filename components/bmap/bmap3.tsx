@@ -1,5 +1,6 @@
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
+import MapvglView from 'react-bmapgl/Layer/MapvglView';
 import Map, { MapProps } from 'react-bmapgl/Map';
 
 
@@ -8,29 +9,31 @@ export interface Point extends BMapGL.Point {
 }
 
 
-export interface Bmap2Props extends MapProps {
+export interface Bmap3Props extends MapProps {
     ref: (ref: Bmap3) => void;
 }
 
 @observer
 export class Bmap3 extends Map {
-    view: MapVGL.View;
+    mapvglView = new MapvglView({ map: this.map, effects: ['bright'] });
 
-    constructor(props: Bmap2Props) {
+    constructor(props: Bmap3Props) {
         super(props);
     }
 
-    @computed get self() { return this.map; }
+    @computed get self() {
+        return this.map;
+    }
 
-    put(points: Point[], altitude: number): Bmap3 {
+    addOverlay = (points: Point[], altitude: number): Bmap3 => {
         this.map.addOverlay(
             new BMapGL.Prism(
                 points,
                 altitude,
                 {
-                    topFillColor: '#ffffff',
+                    topFillColor: '#5679ea',
                     topFillOpacity: 0.6,
-                    sideFillColor: '#ffffff',
+                    sideFillColor: '#5679ea',
                     sideFillOpacity: 0.9,
                     enableMassClear: true,
                 },
@@ -39,12 +42,8 @@ export class Bmap3 extends Map {
         return this;
     }
 
-    addLayer(opt: MapVGL.LayerOptions): Bmap3 {
-        if (!this.view) {
-            this.view = new MapVGL.View({ map: this.map });
-        }
-        const layer = new MapVGL.Layer(this.map, opt);
-        this.view.addLayer(layer);
+    addLayer(layer): Bmap3 {
+        console.log("", this.mapvglView.view.addLayer(layer));
         return this;
     }
 
