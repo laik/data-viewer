@@ -1,4 +1,5 @@
 import React from 'react';
+import { bind } from '../../core/utils';
 import { BaiduMap } from '../bmap';
 import { BMapTrackAnimation } from '../bmap/animation';
 import { BMapPrism } from '../bmap/custom-overlay';
@@ -10,11 +11,27 @@ import hp from './data/hp.json';
 import lw from './data/lw.json';
 
 @withMapApi
+@bind()
 export default class Layout extends React.Component {
+    map: BaiduMap = null;
+
+    inject(map: BaiduMap) { this.map = map }
+
     handleBMapPrismClick(e) {
         console.log('---->e', e.target);
+        // this.map.mapRef.setZoom(22);
+        this.map.addChild(<BMapPrism
+            points={this.convert(lw)}
+            altitude={200}
+            topFillColor={'#2F312F'}
+            topFillOpacity={0.6}
+            sideFillColor={'#2F312F'}
+            sideFillOpacity={0.9}
+            enableMassClear={true}
+            listeners={{ "click": this.handleBMapPrismClick }}
+        />)
     }
-    
+
     convert(src: number[][]): any {
         let paths = [];
         for (let i = 0; i < src.length; i++) {
@@ -32,7 +49,7 @@ export default class Layout extends React.Component {
             const points = src[i];
             let lng = points[0];
             let lat = points[1];
-            paths.push([lng,lat]);
+            paths.push([lng, lat]);
         }
         return paths;
     }
@@ -56,7 +73,7 @@ export default class Layout extends React.Component {
 
         var pl = new BMapGL.Polyline(hppath);
         return (
-            <BaiduMap>
+            <BaiduMap inject={this.inject}>
                 <BMapMapvglView effects={['bright']}>
                     <BMapMapvglLayer
                         type='LineFlowLayer'
@@ -107,16 +124,7 @@ export default class Layout extends React.Component {
 
                 </BMapMapvglView>
 
-                <BMapPrism
-                    points={lwpath}
-                    altitude={200}
-                    topFillColor={'#2F312F'}
-                    topFillOpacity={0.6}
-                    sideFillColor={'#2F312F'}
-                    sideFillOpacity={0.9}
-                    enableMassClear={true}
-                    listeners={{ "click": this.handleBMapPrismClick }}
-                />
+
                 <BMapPrism
                     points={hppath}
                     altitude={200}

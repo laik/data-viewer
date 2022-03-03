@@ -22,17 +22,24 @@ export interface BaiduMapProps {
 	navigationControlProps?: ControlProps;
 	scaleControlProps?: ControlProps;
 	zoomControlProps?: ControlProps;
-	children?: React.ReactElement[] | React.ReactElement;
+	children?: React.ReactElement[];
+	inject?: (map: BaiduMap) => void;
 }
 @withMapApi
 @observer
 export class BaiduMap extends React.Component<BaiduMapProps> {
 	static defaultProps = {};
 	@observable mapRef = null;
+	@observable children: React.ReactElement[] = [];
 	static path = [];
 
 	constructor(props) {
 		super(props);
+		this.children.push(...props.children);
+	}
+
+	addChild(child) {
+		this.children.push(child);
 	}
 
 	render() {
@@ -47,6 +54,7 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 			scaleControlProps,
 			zoomControlProps,
 			children,
+			inject,
 		} = this.props;
 
 		return (
@@ -60,6 +68,7 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 
 				ref={(ref) => {
 					ref ? this.mapRef = ref.map : null;
+					inject && inject(this);
 				}}
 
 				{...mapProps}>
@@ -76,13 +85,7 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 				{zoomControl ? (
 					<ZoomControl map={this.mapRef} {...zoomControlProps} />
 				) : null}
-				{children
-					? Array.isArray(children)
-						? children.map((child) =>
-							React.cloneElement(child, { map: this.mapRef })
-						)
-						: React.cloneElement(children, { map: this.mapRef })
-					: null}
+				{this.children.map((child) => React.cloneElement(child, { map: this.mapRef }))}
 			</Map>
 		);
 	}
