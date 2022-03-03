@@ -101,17 +101,25 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 	@observable mapRef = null;
 	@observable viewRef = null;
 
+	@observable layers: React.ReactElement[] = [];
+
 	@observable listeners = this.props.listeners || {};
 	@observable zoom = this.props.mapProps.zoom || 12;
+
+	addViewLayer = (layer) => {
+		this.layers.push(layer);
+	};
 
 	renderView = () => {
 		/** 图层管理器 */
 		if (!this.props.useView) return null;
+		console.log('this.layers', this.layers);
 		return (
 			<MapvglView
 				map={this.mapRef}
-				ref={(ref) => (ref && ref.view ? (this.viewRef = ref.view) : null)}
-			/>
+				ref={(ref) => (ref && ref.view ? (this.viewRef = ref.view) : null)}>
+				{this.layers}
+			</MapvglView>
 		);
 	};
 
@@ -173,7 +181,7 @@ BaiduMap.defaultProps = {
 	mapProps: {
 		zoom: 12,
 		maxZoom: 22,
-		minZoom: 12,
+		// minZoom: 12,
 		tilt: 10,
 	},
 	mapTypeControlProps: {},
