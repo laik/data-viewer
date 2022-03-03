@@ -2,7 +2,6 @@ import React from 'react';
 import { bind } from '../../core/utils';
 import { Bmap3, createPrism, Point } from '../bmap/bmap3';
 import { withMapApi } from '../bmap/wrapper';
-import line139Path from './data/139line.json';
 import hp from './data/hp.json';
 import lw from './data/lw.json';
 
@@ -48,6 +47,7 @@ export default class Layout extends React.Component {
 
     onClick(e) {
         console.log('---->e', e);
+
         const prismOpt = {
             topFillColor: '#5679ea',
             topFillOpacity: 0.6,
@@ -55,31 +55,45 @@ export default class Layout extends React.Component {
             sideFillOpacity: 0.9,
             enableMassClear: true,
         };
-        this.bmap.addOverlay(createPrism(this.convert(lw), 200, prismOpt));
-        this.bmap.addOverlay(createPrism(this.convert(hp), 200, prismOpt))
+
+        const prisms = [
+            createPrism(this.convert(lw), 200, prismOpt),
+            createPrism(this.convert(hp), 200, prismOpt),
+        ]
+        this.bmap.
+            addOverlay(prisms);
 
 
-        this.bmap.addLayer({
-            type: 'LineTripLayer',
-            options: {
-                color: 'rgba(230, 242, 30)',
-                step: 10,
-                trailLength: 200,
-                startTime: 0,
-                endTime: 1000,
-            },
-            data: [{
-                geometry: {
-                    type: 'LineString',
-                    coordinates: this.convert2(line139Path),
+        this.bmap.
+            addLayer(
+                'CircleLayer',
+                [{
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [113.420416, 23.172711],
+                    }
+                }],
+                {
+                    color: 'rgba(230, 242, 30)',
+                    size: 1000,
+                },
+                {
+                    // 绘制带波纹扩散的圆
+                    type: 'wave',
+                    // 扩散半径，支持直接设置和回调两种形式
+                    radius: 25,
+                    // 周期影响扩散速度，越小越快
+                    duration: 1 / 3,
+                    // 拖尾影响波纹数，越大越多
+                    trail: 4
                 }
-            }],
-        })
+            )
     }
 
     render() {
         return <Bmap3
             center={'广州市'}
+
             zoom={13}
             ref={this.ref}
             onClick={this.onClick}
