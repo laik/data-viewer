@@ -64,6 +64,7 @@ export interface BaiduMapProps {
 
 @observer
 export class BaiduMap extends React.Component<BaiduMapProps> {
+
 	static defaultProps = {};
 	@observable mapRef = null;
 	static path = [];
@@ -91,7 +92,6 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 				ref={(ref) => {
 					if (ref) {
 						this.mapRef = ref.map;
-						this.props.onMapRef(ref.map);
 					}
 				}}
 				{...mapProps}>
