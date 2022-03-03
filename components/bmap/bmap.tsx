@@ -7,12 +7,41 @@ import NavigationControl from 'react-bmapgl/Control/NavigationControl';
 import ScaleControl from 'react-bmapgl/Control/ScaleControl';
 import ZoomControl from 'react-bmapgl/Control/ZoomControl';
 import Map, { MapProps } from 'react-bmapgl/Map';
-import { withMapApi } from './wrapper';
 
-export interface IMapProps extends MapProps {
-	onZoomStart: (event) => void;
-	onZoomEnd: (evnet) => void;
-}
+export type eventsMap =
+	| 'onClick'
+	| 'onDblclick'
+	| 'onRightclick'
+	| 'onRightdblclick'
+	| 'onMaptypechange'
+	| 'onMousemove'
+	| 'onMouseover'
+	| 'onMouseout'
+	| 'onMovestart'
+	| 'onMoving'
+	| 'onMoveend'
+	| 'onZoomstart'
+	| 'onZoomend'
+	| 'onAddoverlay'
+	| 'onAddcontrol'
+	| 'onRemovecontrol'
+	| 'onRemoveoverlay'
+	| 'onClearoverlays'
+	| 'onDragstart'
+	| 'onDragging'
+	| 'onDragend'
+	| 'onAddtilelayer'
+	| 'onRemovetilelayer'
+	| 'onLoad'
+	| 'onResize'
+	| 'onHotspotclick'
+	| 'onHotspotover'
+	| 'onHotspotout'
+	| 'onTilesloaded'
+	| 'onTouchstart'
+	| 'onTouchmove'
+	| 'onTouchend'
+	| 'onLongpress';
 
 // 百度地图图层组件
 export interface BaiduMapProps {
@@ -20,21 +49,24 @@ export interface BaiduMapProps {
 	navigationControl?: boolean;
 	scaleControl?: boolean;
 	zoomControl?: boolean;
-	mapProps?: IMapProps;
+	mapProps?: MapProps;
 	mapTypeControlProps?: ControlProps;
 	navigationControlProps?: ControlProps;
 	scaleControlProps?: ControlProps;
 	zoomControlProps?: ControlProps;
+	/** 传递 map ref 到 父组件 */
+	onMapRef?: (ref) => void;
+	/** 添加监听事件处理*/
+	listeners?: {
+		eventsMap: (evt) => void;
+	};
 }
-@withMapApi
+
 @observer
 export class BaiduMap extends React.Component<BaiduMapProps> {
 	static defaultProps = {};
 	@observable mapRef = null;
-
 	static path = [];
-
-	listeners = {};
 
 	constructor(props) {
 		super(props);
@@ -50,20 +82,17 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 			navigationControlProps,
 			scaleControlProps,
 			zoomControlProps,
+			mapProps,
 		} = this.props;
-
-		const mapProps = {
-			...this.props.mapProps,
-			...this.listeners,
-		};
 
 		return (
 			<Map
 				center={'广州市'}
-				zoom={30}
-				style={{ width: '100%', height: '100%' }}
 				ref={(ref) => {
-					ref ? (this.mapRef = ref.map) : null;
+					if (ref) {
+						this.mapRef = ref.map;
+						this.props.onMapRef(ref.map);
+					}
 				}}
 				{...mapProps}>
 				{mapTypeControl ? (
