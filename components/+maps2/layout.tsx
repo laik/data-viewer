@@ -14,6 +14,7 @@ export default class Layout extends React.Component {
     handleBMapPrismClick(e) {
         console.log('---->e', e.target);
     }
+    
     convert(src: number[][]): any {
         let paths = [];
         for (let i = 0; i < src.length; i++) {
@@ -21,6 +22,17 @@ export default class Layout extends React.Component {
             let lng = points[0];
             let lat = points[1];
             paths.push(new BMapGL.Point(Number(lng), Number(lat)));
+        }
+        return paths;
+    }
+
+    convert2(src: number[][]): any {
+        let paths = [];
+        for (let i = 0; i < src.length; i++) {
+            const points = src[i];
+            let lng = points[0];
+            let lat = points[1];
+            paths.push([lng,lat]);
         }
         return paths;
     }
@@ -42,7 +54,6 @@ export default class Layout extends React.Component {
         }
 
 
-
         var pl = new BMapGL.Polyline(hppath);
         return (
             <BaiduMap>
@@ -59,7 +70,7 @@ export default class Layout extends React.Component {
                         data={[{
                             geometry: {
                                 type: 'LineString',
-                                coordinates: [...line139Path]
+                                coordinates: this.convert2(line139Path),
                             }
                         }]} />
 
@@ -75,7 +86,7 @@ export default class Layout extends React.Component {
                         data={[{
                             geometry: {
                                 type: 'LineString',
-                                coordinates: [...line139Path]
+                                coordinates: this.convert2(line139Path),
                             }
                         }]} />
                     {/* 
