@@ -10,10 +10,12 @@ import lw from './data/lw.json';
 @withMapApi
 export default class Layout extends React.Component {
 	@observable view = null;
+	@observable bmapRef = null;
 
 	handleBMapPrismClick(e) {
 		console.log('---->e', e.target);
-		console.log('---->view', this.view);
+		console.log('---->view', this.bmapRef.view);
+		console.log('---->map', this.bmapRef.map);
 	}
 
 	render() {
@@ -35,7 +37,7 @@ export default class Layout extends React.Component {
 		var pl = new BMapGL.Polyline(hppath);
 
 		return (
-			<BaiduMap useView onViewRef={(view) => (this.view = view)}>
+			<BaiduMap ref={(ref) => (this.bmapRef = ref)} useView>
 				<BMapPrism
 					points={lwpath}
 					altitude={3000}

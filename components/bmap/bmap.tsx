@@ -88,10 +88,6 @@ export interface BaiduMapProps {
 	zoomControlProps?: ControlProps;
 	/** 开启图层管理器 */
 	useView?: boolean;
-	/** 传递 map ref 到 父组件 */
-	onMapRef?: (map) => void;
-	/** 传递 view ref 到 父组件 */
-	onViewRef?: (view) => void;
 	/** 添加监听事件处理*/
 	listeners?: {
 		eventsMap: (evt) => void;
@@ -114,14 +110,7 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 		return (
 			<MapvglView
 				map={this.mapRef}
-				ref={(ref) => {
-					if (ref) {
-						this.viewRef = ref.view;
-						typeof this.props.onViewRef == 'function'
-							? this.props.onViewRef(ref.view)
-							: null;
-					}
-				}}
+				ref={(ref) => (ref && ref.view ? (this.viewRef = ref.view) : null)}
 			/>
 		);
 	};
@@ -153,14 +142,7 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 				<Map
 					center={'广州市'}
 					style={{ height: '800px' }}
-					ref={(ref) => {
-						if (ref) {
-							this.mapRef = ref.map;
-							typeof this.props.onMapRef == 'function'
-								? this.props.onMapRef(ref.map)
-								: null;
-						}
-					}}
+					ref={(ref) => (ref && ref.map ? (this.mapRef = ref.map) : null)}
 					{...mapProps}>
 					{mapTypeControl ? (
 						<MapTypeControl map={this.mapRef} {...mapTypeControlProps} />
