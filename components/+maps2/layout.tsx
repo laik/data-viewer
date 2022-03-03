@@ -1,57 +1,33 @@
+import { observable } from 'mobx';
 import React from 'react';
 import { bind } from '../../core/utils';
 import { BaiduMap } from '../bmap';
 import { BMapTrackAnimation } from '../bmap/animation';
 import { BMapPrism } from '../bmap/custom-overlay';
-// import { BMapPrism } from '../bmap/custom-overlay';
-import { BMapMapvglLayer, BMapMapvglView } from '../bmap/vgl';
 import { withMapApi } from '../bmap/wrapper';
-import line139Path from './data/139line.json';
 import hp from './data/hp.json';
 import lw from './data/lw.json';
+
+
+function convert<T = [lng: number, lat: number][] | []>(src: number[][]): T {
+    const dst: T = {} as T;
+    src.forEach(row => {
+        const [x, y] = row;
+        dst[x] = y;
+    });
+    return dst;
+}
 
 @withMapApi
 @bind()
 export default class Layout extends React.Component {
-    map: BaiduMap = null;
-
-    inject(map: BaiduMap) { this.map = map }
+    @observable view = null;
+    @observable bmapRef = null;
 
     handleBMapPrismClick(e) {
         console.log('---->e', e.target);
-        // this.map.mapRef.setZoom(22);
-        this.map.addChild(<BMapPrism
-            points={this.convert(lw)}
-            altitude={200}
-            topFillColor={'#2F312F'}
-            topFillOpacity={0.6}
-            sideFillColor={'#2F312F'}
-            sideFillOpacity={0.9}
-            enableMassClear={true}
-            listeners={{ "click": this.handleBMapPrismClick }}
-        />)
-    }
-
-    convert(src: number[][]): any {
-        let paths = [];
-        for (let i = 0; i < src.length; i++) {
-            const points = src[i];
-            let lng = points[0];
-            let lat = points[1];
-            paths.push(new BMapGL.Point(Number(lng), Number(lat)));
-        }
-        return paths;
-    }
-
-    convert2(src: number[][]): any {
-        let paths = [];
-        for (let i = 0; i < src.length; i++) {
-            const points = src[i];
-            let lng = points[0];
-            let lat = points[1];
-            paths.push([lng, lat]);
-        }
-        return paths;
+        console.log('---->view', this.bmapRef.view);
+        console.log('---->map', this.bmapRef.map);
     }
 
     render() {
@@ -70,72 +46,30 @@ export default class Layout extends React.Component {
             hppath.push(new BMapGL.Point(Number(lng), Number(lat)));
         }
 
-
         var pl = new BMapGL.Polyline(hppath);
+
         return (
-            <BaiduMap inject={this.inject}>
-                <BMapMapvglView effects={['bright']}>
-                    <BMapMapvglLayer
-                        type='LineFlowLayer'
-                        options={{
-                            color: 'rgba(34, 246, 114)',
-                            interval: 0.1,
-                            duration: 2,
-                            trailLength: 0.5,
-                            zoom: 8
-                        }}
-                        data={[{
-                            geometry: {
-                                type: 'LineString',
-                                coordinates: this.convert2(line139Path),
-                            }
-                        }]} />
-
-                    <BMapMapvglLayer
-                        type='LineTripLayer'
-                        options={{
-                            color: 'rgba(230, 242, 30)',
-                            step: 10,
-                            trailLength: 200,
-                            startTime: 0,
-                            endTime: 1000,
-                        }}
-                        data={[{
-                            geometry: {
-                                type: 'LineString',
-                                coordinates: this.convert2(line139Path),
-                            }
-                        }]} />
-                    {/* 
-                    <BMapMapvglLayer
-                        type='MaskLayer'
-                        options={{
-                            color: 'rgba(230, 242, 30)',
-                        }}
-                        data={[{
-                            geometry: {
-                                type: 'Polygon',
-                                coordinates: this.convert(hp),
-                            }
-                        }]} /> */}
-
-
-
-
-                </BMapMapvglView>
-
-
+            <BaiduMap ref={(ref) => (this.bmapRef = ref)} useView>
                 <BMapPrism
-                    points={hppath}
-                    altitude={200}
-                    topFillColor={'#2F312F'}
+                    points={lwpath}
+                    altitude={3000}
+                    topFillColor={'#5679ea'}
                     topFillOpacity={0.6}
-                    sideFillColor={'#2F312F'}
+                    sideFillColor={'#5679ea'}
                     sideFillOpacity={0.9}
                     enableMassClear={true}
-                    listeners={{ "click": this.handleBMapPrismClick }}
+                    listeners={{ click: this.handleBMapPrismClick }}
                 />
-
+                <BMapPrism
+                    points={hppath}
+                    altitude={3000}
+                    topFillColor={'#5679ea'}
+                    topFillOpacity={0.6}
+                    sideFillColor={'#5679ea'}
+                    sideFillOpacity={0.9}
+                    enableMassClear={true}
+                    listeners={{ click: this.handleBMapPrismClick }}
+                />
                 <BMapTrackAnimation
                     poyline={pl}
                     overallView={true}
@@ -143,7 +77,6 @@ export default class Layout extends React.Component {
                     duration={20000}
                     delay={3000}
                 />
-
             </BaiduMap>
         );
     }
