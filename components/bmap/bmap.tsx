@@ -9,7 +9,10 @@ import ZoomControl from 'react-bmapgl/Control/ZoomControl';
 import Map, { MapProps } from 'react-bmapgl/Map';
 import { withMapApi } from './wrapper';
 
-
+export interface IMapProps extends MapProps {
+	onZoomStart: (event) => void;
+	onZoomEnd: (evnet) => void;
+}
 
 // 百度地图图层组件
 export interface BaiduMapProps {
@@ -17,19 +20,21 @@ export interface BaiduMapProps {
 	navigationControl?: boolean;
 	scaleControl?: boolean;
 	zoomControl?: boolean;
-	mapProps?: MapProps;
+	mapProps?: IMapProps;
 	mapTypeControlProps?: ControlProps;
 	navigationControlProps?: ControlProps;
 	scaleControlProps?: ControlProps;
 	zoomControlProps?: ControlProps;
-	children?: React.ReactElement[] | React.ReactElement;
 }
 @withMapApi
 @observer
 export class BaiduMap extends React.Component<BaiduMapProps> {
 	static defaultProps = {};
 	@observable mapRef = null;
+
 	static path = [];
+
+	listeners = {};
 
 	constructor(props) {
 		super(props);
@@ -41,27 +46,26 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 			navigationControl,
 			scaleControl,
 			zoomControl,
-			mapProps,
 			mapTypeControlProps,
 			navigationControlProps,
 			scaleControlProps,
 			zoomControlProps,
-			children,
 		} = this.props;
+
+		const mapProps = {
+			...this.props.mapProps,
+			...this.listeners,
+		};
 
 		return (
 			<Map
 				center={'广州市'}
 				zoom={30}
-				// mapStyleV2={{ styleId: '00b4cbb970cc388d95e664915d263104' }}
 				style={{ width: '100%', height: '100%' }}
-
 				ref={(ref) => {
-					ref ? this.mapRef = ref.map : null;
+					ref ? (this.mapRef = ref.map) : null;
 				}}
-
 				{...mapProps}>
-
 				{mapTypeControl ? (
 					<MapTypeControl map={this.mapRef} {...mapTypeControlProps} />
 				) : null}
@@ -74,13 +78,6 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 				{zoomControl ? (
 					<ZoomControl map={this.mapRef} {...zoomControlProps} />
 				) : null}
-				{children
-					? Array.isArray(children)
-						? children.map((child) =>
-							React.cloneElement(child, { map: this.mapRef })
-						)
-						: React.cloneElement(children, { map: this.mapRef })
-					: null}
 			</Map>
 		);
 	}
