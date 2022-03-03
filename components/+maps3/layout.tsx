@@ -1,6 +1,6 @@
 import React from 'react';
 import { bind } from '../../core/utils';
-import { Bmap3, Point } from '../bmap/bmap3';
+import { Bmap3, createPrism, Point } from '../bmap/bmap3';
 import { withMapApi } from '../bmap/wrapper';
 import line139Path from './data/139line.json';
 import hp from './data/hp.json';
@@ -30,7 +30,7 @@ export default class Layout extends React.Component {
         }
         return paths;
     }
-    
+
     convert2(src: number[][]): any {
         let paths = [];
         for (let i = 0; i < src.length; i++) {
@@ -48,10 +48,17 @@ export default class Layout extends React.Component {
 
     onClick(e) {
         console.log('---->e', e);
-        this.bmap.addOverlay(this.convert(lw), 200);
-        this.bmap.addOverlay(this.convert(hp), 200)
-        
-        
+        const prismOpt = {
+            topFillColor: '#5679ea',
+            topFillOpacity: 0.6,
+            sideFillColor: '#5679ea',
+            sideFillOpacity: 0.9,
+            enableMassClear: true,
+        };
+        this.bmap.addOverlay(createPrism(this.convert(lw), 200, prismOpt));
+        this.bmap.addOverlay(createPrism(this.convert(hp), 200, prismOpt))
+
+
         this.bmap.addLayer({
             type: 'LineTripLayer',
             options: {
