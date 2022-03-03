@@ -1,9 +1,19 @@
 import React from 'react';
 import { bind } from '../../core/utils';
-import { Bmap3 } from '../bmap/bmap3';
+import { Bmap3, Point } from '../bmap/bmap3';
 import { withMapApi } from '../bmap/wrapper';
+import line139Path from './data/139line.json';
 import hp from './data/hp.json';
 import lw from './data/lw.json';
+
+function convert<T = Point[] | []>(src: number[][]): T {
+    const dst: T = {} as T;
+    src.forEach(row => {
+        const [x, y] = row;
+        dst[x] = y;
+    });
+    return dst;
+}
 
 @withMapApi
 @bind()
@@ -39,6 +49,23 @@ export default class Layout extends React.Component {
         console.log('---->e', e);
         this.bmap.put(this.convert(lw), 200);
         this.bmap.put(this.convert(hp), 200)
+
+        this.bmap.addLayer({
+            type: 'LineTripLayer',
+            options: {
+                color: 'rgba(230, 242, 30)',
+                step: 10,
+                trailLength: 200,
+                startTime: 0,
+                endTime: 1000,
+            },
+            data: [{
+                geometry: {
+                    type: 'LineString',
+                    coordinates: this.convert2(line139Path),
+                }
+            }],
+        })
     }
 
     render() {

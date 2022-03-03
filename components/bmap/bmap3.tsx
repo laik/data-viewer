@@ -14,7 +14,7 @@ export interface Bmap2Props extends MapProps {
 
 @observer
 export class Bmap3 extends Map {
-    views: MapVGL.View[];
+    view: MapVGL.View;
 
     constructor(props: Bmap2Props) {
         super(props);
@@ -30,12 +30,21 @@ export class Bmap3 extends Map {
                 {
                     topFillColor: '#ffffff',
                     topFillOpacity: 0.6,
-                    sideFillColor: '#2F312F',
+                    sideFillColor: '#ffffff',
                     sideFillOpacity: 0.9,
                     enableMassClear: true,
                 },
             )
         );
+        return this;
+    }
+
+    addLayer(opt: MapVGL.LayerOptions): Bmap3 {
+        if (!this.view) {
+            this.view = new MapVGL.View({ map: this.map });
+        }
+        const layer = new MapVGL.Layer(this.map, opt);
+        this.view.addLayer(layer);
         return this;
     }
 
