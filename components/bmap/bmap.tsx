@@ -11,6 +11,7 @@ import MapTypeControl from 'react-bmapgl/Control/MapTypeControl';
 import NavigationControl from 'react-bmapgl/Control/NavigationControl';
 import ScaleControl from 'react-bmapgl/Control/ScaleControl';
 import ZoomControl from 'react-bmapgl/Control/ZoomControl';
+import MapvglView from 'react-bmapgl/Layer/MapvglView';
 import Map, { MapProps } from 'react-bmapgl/Map';
 
 export type eventsMap =
@@ -85,8 +86,8 @@ export interface BaiduMapProps {
 	navigationControlProps?: ControlProps;
 	scaleControlProps?: ControlProps;
 	zoomControlProps?: ControlProps;
-	/** 传递 map ref 到 父组件 */
-	onMapRef?: (ref) => void;
+	/** 开启图层管理器 */
+	useView?: boolean;
 	/** 添加监听事件处理*/
 	listeners?: {
 		eventsMap: (evt) => void;
@@ -98,12 +99,21 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 	static defaultProps = {};
 
 	@observable mapRef = null;
+	@observable viewRef = null;
+
 	@observable listeners = this.props.listeners || {};
 	@observable zoom = this.props.mapProps.zoom || 12;
 
-	constructor(props) {
-		super(props);
-	}
+	renderView = () => {
+		/** 图层管理器 */
+		if (!this.props.useView) return null;
+		return (
+			<MapvglView
+				map={this.mapRef}
+				ref={(ref) => (ref && ref.view ? (this.viewRef = ref.view) : null)}
+			/>
+		);
+	};
 
 	render() {
 		const {
@@ -115,6 +125,7 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 			navigationControlProps,
 			scaleControlProps,
 			zoomControlProps,
+			children,
 		} = this.props;
 
 		const mapProps = {
@@ -131,14 +142,7 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 				<Map
 					center={'广州市'}
 					style={{ height: '800px' }}
-					ref={(ref) => {
-						if (ref) {
-							this.mapRef = ref.map;
-							typeof this.props.onMapRef == 'function'
-								? this.props.onMapRef(ref.map)
-								: null;
-						}
-					}}
+					ref={(ref) => (ref && ref.map ? (this.mapRef = ref.map) : null)}
 					{...mapProps}>
 					{mapTypeControl ? (
 						<MapTypeControl map={this.mapRef} {...mapTypeControlProps} />
@@ -152,6 +156,8 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 					{zoomControl ? (
 						<ZoomControl map={this.mapRef} {...zoomControlProps} />
 					) : null}
+					{children}
+					{this.renderView()}
 				</Map>
 			</Box>
 		);
@@ -163,6 +169,7 @@ BaiduMap.defaultProps = {
 	navigationControl: true,
 	scaleControl: true,
 	zoomControl: true,
+	useView: false,
 	mapProps: {
 		zoom: 12,
 		maxZoom: 22,
