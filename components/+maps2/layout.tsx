@@ -1,22 +1,18 @@
 import { observable } from 'mobx';
 import React from 'react';
 import { bind } from '../../core/utils';
-import { BaiduMap } from '../bmap';
+import { BaiduMap, BMapRef } from '../bmap';
 import { BMapTrackAnimation } from '../bmap/animation';
 import { BMapPrism } from '../bmap/custom-overlay';
 import { withMapApi } from '../bmap/wrapper';
 import hp from './data/hp.json';
-import lw from './data/lw.json';
 
 const mapvgl = require('mapvgl');
 
 @withMapApi
 @bind()
 export default class Layout extends React.Component {
-	@observable view = null;
-	@observable bmapRef = null;
-	@observable map: BMapGL.Map = null;
-	@observable baidu: BaiduMap = null;
+	@observable bmapRef: BMapRef = null;
 
 	convert(src: number[][]): any {
 		let paths = [];
@@ -26,25 +22,11 @@ export default class Layout extends React.Component {
 		return paths;
 	}
 
-	handleBMapPrismClick(e) {
-		console.log('---->e', e.target);
-		console.log('---->map', this.map);
-		console.log('---->view', this.view);
-	}
-
-	mapRef(ref) {
-		this.map = ref;
-	}
-
-	viewRef(ref) {
-		this.view = ref;
-	}
-
 	mapOnCilck(e) {
-		switch (this.map.getZoom()) {
+		switch (this.bmapRef.map.getZoom()) {
 			case 12:
-				this.map.setZoom(16);
-				this.map.setTilt(0);
+				this.bmapRef.map.setZoom(16);
+				this.bmapRef.map.setTilt(0);
 				var layer = new mapvgl.TextLayer({
 					color: '#fff',
 					fontFamily: 'Microsoft Yahei',
@@ -65,22 +47,21 @@ export default class Layout extends React.Component {
 						},
 					],
 				});
-				this.bmapRef.addViewLayer('circle', layer);
+				this.bmapRef.addMapvglViewLayer('circle', layer);
 				break;
 			case 16:
-				this.map.setZoom(18);
-				this.map.setTilt(45);
-				this.bmapRef.removeViewLayer('circle');
+				this.bmapRef.map.setZoom(18);
+				this.bmapRef.map.setTilt(45);
 				break;
 			case 18:
-				this.map.setZoom(20);
-				this.map.setTilt(45);
+				this.bmapRef.map.setZoom(20);
+				this.bmapRef.map.setTilt(45);
 				break;
 			case 22:
-				this.map.setZoom(12);
+				this.bmapRef.map.setZoom(12);
+				this.bmapRef.removeMapvglViewLayer('circle');
 				break;
 		}
-		// alert(e.point.lng + ', ' + e.point.lat);
 	}
 
 	districtsPrism = (data: any[]): JSX.Element => {
@@ -97,7 +78,6 @@ export default class Layout extends React.Component {
 				sideFillColor={'#5679ea'}
 				sideFillOpacity={0.9}
 				enableMassClear={true}
-				listeners={{ click: this.handleBMapPrismClick }}
 			/>
 		);
 	};
@@ -129,19 +109,12 @@ export default class Layout extends React.Component {
 
 		return (
 			<BaiduMap
-				ref={(ref) => {
+				ref={(ref: any) => {
 					ref ? (this.bmapRef = ref) : null;
-					ref ? (this.map = ref.mapRef) : null;
-					ref ? (this.view = ref.viewRef) : null;
 				}}
-				useView={true}
-				mapRef={this.mapRef}
-				viewRef={this.viewRef}
-				mapOnCilck={this.mapOnCilck}
-				baiduRef={(ref) => {
-					this.baidu = ref;
+				listeners={{
+					onClick: this.mapOnCilck,
 				}}>
-				{this.districtsPrism(lw)}
 				{this.districtsPrism(hp)}
 			</BaiduMap>
 		);
