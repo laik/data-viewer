@@ -3,9 +3,10 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import { observable } from 'mobx';
+import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import React from 'react';
+import { MapvglLayer } from 'react-bmapgl';
 import { ControlProps } from 'react-bmapgl/Control/Control';
 import MapTypeControl from 'react-bmapgl/Control/MapTypeControl';
 import NavigationControl from 'react-bmapgl/Control/NavigationControl';
@@ -13,6 +14,7 @@ import ScaleControl from 'react-bmapgl/Control/ScaleControl';
 import ZoomControl from 'react-bmapgl/Control/ZoomControl';
 import MapvglView from 'react-bmapgl/Layer/MapvglView';
 import Map, { MapProps } from 'react-bmapgl/Map';
+import { BMapMapvglView } from './vgl';
 
 export type eventsMap =
 	| 'onClick'
@@ -92,37 +94,90 @@ export interface BaiduMapProps {
 	listeners?: {
 		eventsMap: (evt) => void;
 	};
+	mapRef?: (ref: BMapGL.Map) => void;
+	mapOnCilck?: (evt) => void;
+	viewRef?: (ref: MapVGL.View) => void;
+	baiduRef?: (ref: BaiduMap) => void;
 }
 
 @observer
 export class BaiduMap extends React.Component<BaiduMapProps> {
 	static defaultProps = {};
 
-	@observable mapRef = null;
-	@observable viewRef = null;
+	@observable mapRef: BMapGL.Map = null;
+	@observable viewRef: MapVGL.View = null;
+	@observable mapvglView: MapvglView = null;
 
-	@observable layers: React.ReactElement[] = [];
+	@observable layersElement: React.ReactElement[] = [];
+	@observable layers: MapVGL.Layer[] = [];
 
 	@observable listeners = this.props.listeners || {};
 	@observable zoom = this.props.mapProps.zoom || 12;
+	@observable children = this.props.children;
 
-	addViewLayer = (layer) => {
+
+	@observable openView = false;
+
+	constructor(props) {
+		super(props);
+	}
+
+	@action
+	addViewLayer(layer: React.ReactElement) {
+		this.layersElement.push(layer);
+	};
+
+	@computed get getlayers() {
+		return this.layers
+	}
+
+	@computed get isopenView() {
+		return this.openView
+	}
+
+	open() {
+		this.openView = true
+		console.log("openView", this.openView, this.viewRef)
+		const layer = this.layers[0];
+		this.viewRef.removeLayer(layer);
+	}
+
+	circleLayer = () => {
+		let layer;
+		const c = <MapvglLayer
+			map={this.mapRef}
+			view={this.viewRef}
+			type='CircleLayer'
+			data={[
+				{
+					geometry: {
+						type: 'Point',
+						coordinates: [113.420416, 23.172711],
+					},
+				},
+				{
+					geometry: {
+						type: 'Point',
+						coordinates: [113.410416, 23.162211],
+					},
+				},
+			]}
+			options={{
+				color: 'rgba(50, 50, 200, 1)',
+				shape: 'circle', // 默认为圆形，可传square改为正方形
+				blend: 'lighter',
+				size: 5,
+			}}
+		/>
+		this.layersElement.push(c);
 		this.layers.push(layer);
-	};
 
-	renderView = () => {
-		/** 图层管理器 */
-		if (!this.props.useView) return null;
-		console.log('this.layers', this.layers);
-		return (
-			<MapvglView
-				map={this.mapRef}
-				ref={(ref) => (ref && ref.view ? (this.viewRef = ref.view) : null)}>
-				{this.layers}
-			</MapvglView>
-		);
-	};
+		return c;
+	}
 
+	addview = () => {
+
+	}
 	render() {
 		const {
 			mapTypeControl,
@@ -134,6 +189,10 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 			scaleControlProps,
 			zoomControlProps,
 			children,
+			mapRef,
+			viewRef,
+			mapOnCilck,
+			baiduRef,
 		} = this.props;
 
 		const mapProps = {
@@ -141,6 +200,7 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 			...this.listeners,
 		};
 
+		baiduRef(this);
 		return (
 			<Box sx={{ m: 2 }}>
 				<ZoomSelect
@@ -150,7 +210,11 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 				<Map
 					center={'广州市'}
 					style={{ height: '800px' }}
-					ref={(ref) => (ref && ref.map ? (this.mapRef = ref.map) : null)}
+					ref={(ref) => {
+						ref && ref.map ? this.mapRef = ref.map : null;
+						ref && ref.map && mapRef ? mapRef(ref.map) : null;
+					}}
+					onClick={mapOnCilck}
 					{...mapProps}>
 					{mapTypeControl ? (
 						<MapTypeControl map={this.mapRef} {...mapTypeControlProps} />
@@ -164,13 +228,34 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 					{zoomControl ? (
 						<ZoomControl map={this.mapRef} {...zoomControlProps} />
 					) : null}
-					{children}
-					{this.renderView()}
+					{this.children}
+
+
+					<BMapMapvglView
+						effects={['bloom']}
+					>
+						{this.circleLayer()}
+					</BMapMapvglView>
+					{/* <div></div> */}
+					{/* {this.layers.map((layer) => {
+						<MapvglView
+							map={this.mapRef}
+							ref={(ref) => {
+								ref && ref.view ? (this.viewRef = ref.view) : null;
+								viewRef && viewRef(ref.view);
+								console.log("layer->", layer);
+							}}>
+							{layer}
+
+						</MapvglView>
+					})} */}
+
 				</Map>
-			</Box>
+			</Box >
 		);
 	}
 }
+
 
 BaiduMap.defaultProps = {
 	mapTypeControl: true,
