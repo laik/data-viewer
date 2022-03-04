@@ -1,20 +1,21 @@
 import Box from '@mui/material/Box';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import { action, computed, observable } from 'mobx';
+import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import React from 'react';
-import { MapvglLayer } from 'react-bmapgl';
 import { ControlProps } from 'react-bmapgl/Control/Control';
 import MapTypeControl from 'react-bmapgl/Control/MapTypeControl';
 import NavigationControl from 'react-bmapgl/Control/NavigationControl';
-import ScaleControl from 'react-bmapgl/Control/ScaleControl';
 import ZoomControl from 'react-bmapgl/Control/ZoomControl';
 import MapvglView from 'react-bmapgl/Layer/MapvglView';
 import Map, { MapProps } from 'react-bmapgl/Map';
-import { BMapMapvglView } from './vgl';
+
+export interface BMapRef {
+	map: BMapGL.Map;
+	view: MapVGL.View;
+	addMapvglViewLayer: (key: string, x: MapVGL.Layer) => void;
+	removeMapvglViewLayer: (key: string) => void;
+	destroyMapvglView: () => void;
+}
 
 export type eventsMap =
 	| 'onClick'
@@ -51,32 +52,6 @@ export type eventsMap =
 	| 'onTouchend'
 	| 'onLongpress';
 
-function ZoomSelect(props: { zoom: number; onChange }) {
-	const [zoom, setZoom] = React.useState(12);
-
-	const handleChange = (event) => {
-		setZoom(event.target.value);
-		props.onChange(event.target.value);
-	};
-
-	return (
-		<FormControl fullWidth size='small' sx={{ mb: 1, mt: 1 }}>
-			<InputLabel id='zoom-label'>级数</InputLabel>
-			<Select
-				labelId='zoom-label'
-				id='zoom-select'
-				label='级数'
-				value={zoom}
-				onChange={handleChange}>
-				<MenuItem value={12}>12</MenuItem>
-				<MenuItem value={16}>16</MenuItem>
-				<MenuItem value={18}>18</MenuItem>
-				<MenuItem value={22}>22</MenuItem>
-			</Select>
-		</FormControl>
-	);
-}
-
 // 百度地图图层组件
 export interface BaiduMapProps {
 	mapTypeControl?: boolean;
@@ -88,174 +63,115 @@ export interface BaiduMapProps {
 	navigationControlProps?: ControlProps;
 	scaleControlProps?: ControlProps;
 	zoomControlProps?: ControlProps;
-	/** 开启图层管理器 */
-	useView?: boolean;
 	/** 添加监听事件处理*/
 	listeners?: {
-		eventsMap: (evt) => void;
+		[key: string]: (evt) => void;
 	};
-	mapRef?: (ref: BMapGL.Map) => void;
-	mapOnCilck?: (evt) => void;
-	viewRef?: (ref: MapVGL.View) => void;
-	baiduRef?: (ref: BaiduMap) => void;
 }
 
 @observer
 export class BaiduMap extends React.Component<BaiduMapProps> {
 	static defaultProps = {};
 
-	@observable mapRef: BMapGL.Map = null;
-	@observable viewRef: MapVGL.View = null;
-	@observable mapvglView: MapvglView = null;
-
-	@observable layersElement: React.ReactElement[] = [];
-	@observable layers: MapVGL.Layer[] = [];
-
 	@observable listeners = this.props.listeners || {};
-	@observable zoom = this.props.mapProps.zoom || 12;
-	@observable children = this.props.children;
+	@observable map: BMapGL.Map = null;
+	@observable view: MapVGL.View = null;
+	@observable layers = observable.map({});
 
-
-	@observable openView = false;
-
-	constructor(props) {
-		super(props);
-	}
-
-	@action
-	addViewLayer(layer: React.ReactElement) {
-		this.layersElement.push(layer);
+	mapTypeControl = () => {
+		/** 地图类型控件 3D/2D */
+		if (!this.props.mapTypeControl) return;
+		const { mapTypeControlProps } = this.props;
+		return <MapTypeControl map={this.map} {...mapTypeControlProps} />;
 	};
 
-	@computed get getlayers() {
-		return this.layers
-	}
+	navigationControl = () => {
+		/** 3D控件 */
+		if (!this.props.navigationControl) return;
+		const { navigationControlProps } = this.props;
+		return <NavigationControl map={this.map} {...navigationControlProps} />;
+	};
 
-	@computed get isopenView() {
-		return this.openView
-	}
+	scaleControl = () => {
+		/** 比例尺控件 */
+		if (!this.props.navigationControl) return;
+		const { navigationControlProps } = this.props;
+		return <NavigationControl map={this.map} {...navigationControlProps} />;
+	};
 
-	open() {
-		this.openView = true
-		console.log("openView", this.openView, this.viewRef)
-		const layer = this.layers[0];
-		this.viewRef.removeLayer(layer);
-	}
+	zoomControl = () => {
+		/** 缩放控件 */
+		if (!this.props.zoomControl) return;
+		const { zoomControlProps } = this.props;
+		return <ZoomControl map={this.map} {...zoomControlProps} />;
+	};
 
-	circleLayer = () => {
-		let layer;
-		const c = <MapvglLayer
-			map={this.mapRef}
-			view={this.viewRef}
-			type='CircleLayer'
-			data={[
-				{
-					geometry: {
-						type: 'Point',
-						coordinates: [113.420416, 23.172711],
-					},
-				},
-				{
-					geometry: {
-						type: 'Point',
-						coordinates: [113.410416, 23.162211],
-					},
-				},
-			]}
-			options={{
-				color: 'rgba(50, 50, 200, 1)',
-				shape: 'circle', // 默认为圆形，可传square改为正方形
-				blend: 'lighter',
-				size: 5,
-			}}
-		/>
-		this.layersElement.push(c);
-		this.layers.push(layer);
+	control = () => {
+		/** 渲染控件 */
+		return (
+			<>
+				{this.mapTypeControl()}
+				{this.navigationControl()}
+				{this.scaleControl()}
+				{this.zoomControl()}
+			</>
+		);
+	};
 
-		return c;
-	}
+	mapvglView = () => {
+		/** MapVGL图层管理器 */
+		return (
+			<MapvglView
+				effects={['bloom']}
+				map={this.map}
+				ref={(ref) => (ref ? (this.view = ref.view) : null)}
+			/>
+		);
+	};
 
-	addview = () => {
+	addMapvglViewLayer = (key: string, x: MapVGL.Layer) => {
+		/** 添加MapVGL图层  */
+		this.layers[key] = x;
+		this.view.addLayer(x);
+	};
 
-	}
+	removeMapvglViewLayer = (key: string) => {
+		/** 移除MapVGL图层  */
+		this.view.removeLayer(this.layers[key]);
+		this.layers.delete(key);
+	};
+
+	destroyMapvglView = () => {
+		/** 清空MapVGL图层管理器 */
+		if (!this.view) return;
+		this.view.destroy();
+		this.layers.clear();
+	};
+
 	render() {
-		const {
-			mapTypeControl,
-			navigationControl,
-			scaleControl,
-			zoomControl,
-			mapTypeControlProps,
-			navigationControlProps,
-			scaleControlProps,
-			zoomControlProps,
-			children,
-			mapRef,
-			viewRef,
-			mapOnCilck,
-			baiduRef,
-		} = this.props;
-
+		const { children } = this.props;
 		const mapProps = {
 			...this.props.mapProps,
-			...this.listeners,
+			...this.listeners, // eventmap 监听事件绑定
 		};
 
-		baiduRef(this);
 		return (
 			<Box sx={{ m: 2 }}>
-				<ZoomSelect
-					zoom={this.zoom}
-					onChange={(zoom) => ((this.zoom = zoom), this.mapRef.setZoom(zoom))}
-				/>
 				<Map
 					center={'广州市'}
-					style={{ height: '800px' }}
+					style={{ height: '900px' }}
 					ref={(ref) => {
-						ref && ref.map ? this.mapRef = ref.map : null;
-						ref && ref.map && mapRef ? mapRef(ref.map) : null;
+						ref && ref.map ? (this.map = ref.map) : null;
 					}}
-					onClick={mapOnCilck}
 					{...mapProps}>
-					{mapTypeControl ? (
-						<MapTypeControl map={this.mapRef} {...mapTypeControlProps} />
-					) : null}
-					{navigationControl ? (
-						<NavigationControl map={this.mapRef} {...navigationControlProps} />
-					) : null}
-					{scaleControl ? (
-						<ScaleControl map={this.mapRef} {...scaleControlProps} />
-					) : null}
-					{zoomControl ? (
-						<ZoomControl map={this.mapRef} {...zoomControlProps} />
-					) : null}
-					{this.children}
-
-
-					<BMapMapvglView
-						effects={['bloom']}
-					>
-						{this.circleLayer()}
-					</BMapMapvglView>
-					{/* <div></div> */}
-					{/* {this.layers.map((layer) => {
-						<MapvglView
-							map={this.mapRef}
-							ref={(ref) => {
-								ref && ref.view ? (this.viewRef = ref.view) : null;
-								viewRef && viewRef(ref.view);
-								console.log("layer->", layer);
-							}}>
-							{layer}
-
-						</MapvglView>
-					})} */}
-
+					{this.control()}
+					{this.mapvglView()}
+					{children}
 				</Map>
-			</Box >
+			</Box>
 		);
 	}
 }
-
 
 BaiduMap.defaultProps = {
 	mapTypeControl: true,
