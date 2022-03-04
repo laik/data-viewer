@@ -38,7 +38,7 @@ export default class Layout extends React.Component {
         console.log('---->view', this.view);
 
         console.log("---mapview", this.baidu.mapvglView);
-        this.baidu.open()
+        
         // this.baidu.addViewLayer(
         //     <MapvglLayer
         //         map={this.map}
@@ -105,6 +105,8 @@ export default class Layout extends React.Component {
     viewRef(ref) { this.view = ref }
 
     mapOnCilck(e) {
+        this.map.enableScrollWheelZoom();
+        BMapTrackAnimation.start();
         switch (this.map.getZoom()) {
             case 12:
                 this.map.setCenter(e.latlng);
@@ -128,15 +130,13 @@ export default class Layout extends React.Component {
                 this.map.setCenter(e.latlng);
                 this.map.setZoom(12);
                 this.map.setTrafficOff();
-                this.map.enableScrollWheelZoom();
-                BMapTrackAnimation.start();
                 break;
             default:
                 BMapTrackAnimation.cancel();
                 this.map.setZoom(12);
                 this.map.setTrafficOff();
         }
-        // alert(e.latlng);
+
 
         console.log("event", e);
     }
@@ -167,12 +167,43 @@ export default class Layout extends React.Component {
         for (let i = 0; i < data.length; i++) {
             path.push(new BMapGL.Point(Number(data[i][0]), Number(data[i][1])));
         }
+        const pl = new BMapGL.Polyline(path);
+        // var path = [{
+        //     'lng': 116.297611,
+        //     'lat': 40.047363
+        // }, {
+        //     'lng': 116.302839,
+        //     'lat': 40.048219
+        // }, {
+        //     'lng': 116.308301,
+        //     'lat': 40.050566
+        // }, {
+        //     'lng': 116.305732,
+        //     'lat': 40.054957
+        // }, {
+        //     'lng': 116.304754,
+        //     'lat': 40.057953
+        // }, {
+        //     'lng': 116.306487,
+        //     'lat': 40.058312
+        // }, {
+        //     'lng': 116.307223,
+        //     'lat': 40.0563
+        // }];
+        // var point = [];
+        // for (var i = 0; i < path.length; i++) {
+        //     point.push(new BMapGL.Point(path[i].lng, path[i].lat));
+        // }
+        // var pl = new BMapGL.Polyline(point);
+
         return <BMapTrackAnimation
-            poyline={new BMapGL.Polyline(path)}
+            poyline={pl}
             overallView={true}
-            tilt={30}
-            duration={20000}
-            delay={3000}
+            tilt={55}
+            zoom={20}
+            
+            duration={30000}
+            delay={500}
         />
     }
 
@@ -192,12 +223,4 @@ export default class Layout extends React.Component {
             </BaiduMap>
         );
     }
-}
-
-export function createPrism(points, altitude, opt): BMapGL.Overlay {
-    return new BMapGL.Prism(
-        points,
-        altitude,
-        opt,
-    )
 }
