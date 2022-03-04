@@ -105,26 +105,26 @@ export default class Layout extends React.Component {
     viewRef(ref) { this.view = ref }
 
     mapOnCilck(e) {
-        this.map.enableScrollWheelZoom();
-        BMapTrackAnimation.start();
         switch (this.map.getZoom()) {
             case 12:
                 this.map.setCenter(e.latlng);
                 this.map.setZoom(16);
                 this.map.setTilt(0);
-                this.map.setTrafficOn();
+                // this.map.setTrafficOn();
                 break;
             case 16:
                 this.map.setCenter(e.latlng);
                 this.map.setZoom(18);
                 this.map.setTilt(45);
-                this.map.setTrafficOn();
+                this.map.setTrafficOff();
                 break;
             case 18:
                 this.map.setCenter(e.latlng);
                 this.map.setZoom(20);
                 this.map.setTilt(65);
-                this.map.setTrafficOn();
+                this.map.setTrafficOff();
+                this.map.enableScrollWheelZoom();
+                BMapTrackAnimation.start();
                 break;
             case 20:
                 this.map.setCenter(e.latlng);
@@ -200,7 +200,7 @@ export default class Layout extends React.Component {
             poyline={pl}
             overallView={true}
             tilt={55}
-            zoom={20}
+            zoom={18}
             
             duration={30000}
             delay={500}
