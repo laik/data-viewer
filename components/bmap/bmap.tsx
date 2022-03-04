@@ -5,7 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { MapvglLayer } from 'react-bmapgl';
 import { ControlProps } from 'react-bmapgl/Control/Control';
 import MapTypeControl from 'react-bmapgl/Control/MapTypeControl';
@@ -113,13 +113,19 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 
 	@observable listeners = this.props.listeners || {};
 	@observable zoom = this.props.mapProps.zoom || 12;
-	@observable children = this.props.children;
+	@observable children: ReactNode[] = [];
 
 
 	@observable openView = false;
+	
 
 	constructor(props) {
 		super(props);
+	}
+
+	@action
+	addChild = (child) => {
+		this.children.push(child);
 	}
 
 	@action
@@ -139,7 +145,7 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 		this.openView = true
 		console.log("openView", this.openView, this.viewRef)
 		const layer = this.layers[0];
-		this.viewRef.removeLayer(layer);
+		// this.viewRef.removeLayer(layer);
 	}
 
 	circleLayer = () => {
@@ -199,6 +205,8 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 			...this.props.mapProps,
 			...this.listeners,
 		};
+
+		this.children.push(children);
 
 		baiduRef(this);
 		return (

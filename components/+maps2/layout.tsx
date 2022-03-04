@@ -5,8 +5,8 @@ import { BaiduMap } from '../bmap';
 import { BMapTrackAnimation } from '../bmap/animation';
 import { BMapPrism } from '../bmap/custom-overlay';
 import { withMapApi } from '../bmap/wrapper';
+import line139 from './data/139line.json';
 import hp from './data/hp.json';
-import lw from './data/lw.json';
 
 function convert<T = [lng: number, lat: number][] | []>(src: number[][]): T {
     const dst: T = {} as T;
@@ -107,23 +107,42 @@ export default class Layout extends React.Component {
     mapOnCilck(e) {
         switch (this.map.getZoom()) {
             case 12:
+                this.map.setCenter(e.latlng);
                 this.map.setZoom(16);
                 this.map.setTilt(0);
+                this.map.setTrafficOn();
                 break;
             case 16:
+                this.map.setCenter(e.latlng);
                 this.map.setZoom(18);
                 this.map.setTilt(45);
+                this.map.setTrafficOn();
                 break;
             case 18:
+                this.map.setCenter(e.latlng);
                 this.map.setZoom(20);
-                this.map.setTilt(45);
+                this.map.setTilt(65);
+                this.map.setTrafficOn();
                 break;
             case 20:
+                this.map.setCenter(e.latlng);
                 this.map.setZoom(12);
+                this.map.setTrafficOff();
+                this.map.enableScrollWheelZoom();
+                BMapTrackAnimation.start();
                 break;
+            default:
+                BMapTrackAnimation.cancel();
+                this.map.setZoom(12);
+                this.map.setTrafficOff();
         }
-        alert(e.point.lng + ", " + e.point.lat);
-        // this.map.setCenter(e.point);
+        // alert(e.latlng);
+
+        console.log("event", e);
+    }
+
+    onrightclick(e) {
+        console.log("rightclick", e);
     }
 
     districtsPrism = (data: any[]): JSX.Element => {
@@ -158,25 +177,27 @@ export default class Layout extends React.Component {
     }
 
     render() {
-        let hppath = [];
-        for (let i = 0; i < hp.length; i++) {
-            const points = hp[i];
-            let lng = points[0];
-            let lat = points[1];
-            hppath.push(new BMapGL.Point(Number(lng), Number(lat)));
-        }
-
         return (
             <BaiduMap
                 ref={(ref) => { ref ? this.map = ref.mapRef : null; ref ? this.view = ref.viewRef : null; }} useView={true}
-                mapRef={this.mapRef} viewRef={this.viewRef}
+                mapRef={this.mapRef}
+                viewRef={this.viewRef}
                 mapOnCilck={this.mapOnCilck}
                 baiduRef={(ref) => { this.baidu = ref }}
             >
-                {this.districtsPrism(lw)}
+                {/* {this.districtsPrism(lw)} */}
                 {this.districtsPrism(hp)}
+                {this.trackAnimation(line139)}
 
             </BaiduMap>
         );
     }
+}
+
+export function createPrism(points, altitude, opt): BMapGL.Overlay {
+    return new BMapGL.Prism(
+        points,
+        altitude,
+        opt,
+    )
 }

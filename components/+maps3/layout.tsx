@@ -60,8 +60,7 @@ export default class Layout extends React.Component {
             createPrism(this.convert(lw), 200, prismOpt),
             createPrism(this.convert(hp), 200, prismOpt),
         ]
-        this.bmap.
-            addOverlay(prisms);
+        this.bmap.addOverlay(prisms);
 
 
         this.bmap.

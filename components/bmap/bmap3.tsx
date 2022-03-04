@@ -2,6 +2,7 @@ import { observer } from 'mobx-react';
 import { default as MapvglLayer } from 'react-bmapgl/Layer/MapvglLayer';
 import MapvglView from 'react-bmapgl/Layer/MapvglView';
 import Map, { MapProps } from 'react-bmapgl/Map';
+
 export interface Point extends BMapGL.Point { }
 
 export interface Bmap3Props extends MapProps {
@@ -14,6 +15,7 @@ export class Bmap3 extends Map {
 
     constructor(props: Bmap3Props) {
         super(props);
+        // mapvgl.init(this.map);
     }
 
     addOverlay = (overlays: BMapGL.Overlay[]): Bmap3 => {
