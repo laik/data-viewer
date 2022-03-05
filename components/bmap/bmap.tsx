@@ -180,10 +180,10 @@ BaiduMap.defaultProps = {
 	zoomControl: true,
 	useView: false,
 	mapProps: {
-		zoom: 12,
+		zoom: 10,
 		maxZoom: 22,
 		// minZoom: 12,
-		tilt: 10,
+		tilt: 0,
 	},
 	mapTypeControlProps: {},
 	navigationControlProps: {},
