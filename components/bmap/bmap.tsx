@@ -56,6 +56,7 @@ export type eventsMap =
 
 // 百度地图图层组件
 export interface BaiduMapProps {
+	center: string;
 	mapTypeControl?: boolean;
 	navigationControl?: boolean;
 	scaleControl?: boolean;
@@ -152,7 +153,7 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 		this.view.removeLayer(this.layers[key]);
 		this.layers.delete(key);
 	};
-	
+
 	getMapvglViewLayer = (key: string) => {
 		return this.layers[key]
 	}
@@ -165,7 +166,7 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 	};
 
 	render() {
-		const { children } = this.props;
+		const { children, center } = this.props;
 		const mapProps = {
 			...this.props.mapProps,
 			...this.listeners, // eventmap 监听事件绑定
@@ -173,7 +174,7 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 
 		return (
 			<Map
-				center={'广州市'}
+				center={center}
 				style={{ height: '100%' }}
 				mapStyleV2={{ styleId: '00b4cbb970cc388d95e664915d263104' }}
 				ref={(ref) => {
@@ -195,7 +196,7 @@ BaiduMap.defaultProps = {
 	zoomControl: true,
 	useView: false,
 	mapProps: {
-		zoom: 10,
+		zoom: 4,
 		maxZoom: 22,
 		minZoom: 10,
 		tilt: 0,

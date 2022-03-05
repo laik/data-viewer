@@ -48,6 +48,23 @@ export class Tracks {
     constructor(data) {
         Object.assign(this, data);
     }
+
+    toPointList = () => {
+        return this.
+            records.
+            map(record => {
+                let item = {
+                    geometry: {
+                        type: 'LineString',
+                        coordinates: [],
+                    }
+                };
+                record.a.map(point => {
+                    item.geometry.coordinates.push([point[0], point[1]]);
+                })
+                return item;
+            }).flat();
+    }
 }
 
 export function colorRGB() {

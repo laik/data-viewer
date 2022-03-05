@@ -80,6 +80,7 @@ export default class Layout extends React.Component {
 	render() {
 		return (
 			<BaiduMap
+				center={'广州'}
 				ref={(ref: any) => {
 					ref ? (this.bmapRef = ref) : null;
 				}}
