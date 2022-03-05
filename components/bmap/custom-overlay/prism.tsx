@@ -24,8 +24,9 @@ export interface PrismProps extends GraphyProps {
 	enableMassClear?: boolean;
 	/** 添加监听事件处理*/
 	listeners?: {
-		[event: string]: (evt: string, callback: (...args: any[]) => void) => void;
+		[event: string]: (evt: any, callback: (...args: any[]) => void) => void;
 	};
+	ref?: (ref: Prism) => void;
 }
 
 /**
@@ -43,18 +44,19 @@ export class Prism extends Graphy<PrismProps> {
 
 	constructor(props: PrismProps) {
 		super(props);
+
 	}
 
 	getOverlay() {
 		const { altitude } = this.props;
 		const points = this.parsePoints(this.props.points);
-		let prism = new BMapGL.Prism(points, altitude, this.getOptions());
+		this.overlay = new BMapGL.Prism(points, altitude, this.getOptions());
 		if (this.props.listeners) {
 			for (let [evt, cb] of Object.entries(this.props.listeners)) {
-				prism.addEventListener(evt, cb);
+				this.overlay.addEventListener(evt, cb);
 			}
 		}
-		return prism;
+		return this.overlay;
 	}
 
 	parsePoints(posints: BMapGL.Point[] | [number, number][]): BMapGL.Point[] {

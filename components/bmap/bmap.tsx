@@ -1,4 +1,3 @@
-import Box from '@mui/material/Box';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import React from 'react';
@@ -14,6 +13,9 @@ export interface BMapRef {
 	view: MapVGL.View;
 	addMapvglViewLayer: (key: string, x: MapVGL.Layer) => void;
 	removeMapvglViewLayer: (key: string) => void;
+	getMapvglViewLayer: (key: string) => MapVGL.Layer;
+	disableMapvglViewLayer: (key: string) => void;
+	enableMapvglViewLayer: (key: string) => void;
 	destroyMapvglView: () => void;
 }
 
@@ -54,6 +56,7 @@ export type eventsMap =
 
 // 百度地图图层组件
 export interface BaiduMapProps {
+	center: string;
 	mapTypeControl?: boolean;
 	navigationControl?: boolean;
 	scaleControl?: boolean;
@@ -135,11 +138,25 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 		this.view.addLayer(x);
 	};
 
+	disableMapvglViewLayer = (key: string) => {
+		/** 关闭MapVGL图层  */
+		this.view.removeLayer(this.layers[key]);
+	};
+
+	enableMapvglViewLayer = (key: string) => {
+		/** 开启MapVGL图层  */
+		this.view.addLayer(this.layers[key]);
+	};
+
 	removeMapvglViewLayer = (key: string) => {
 		/** 移除MapVGL图层  */
 		this.view.removeLayer(this.layers[key]);
 		this.layers.delete(key);
 	};
+
+	getMapvglViewLayer = (key: string) => {
+		return this.layers[key]
+	}
 
 	destroyMapvglView = () => {
 		/** 清空MapVGL图层管理器 */
@@ -149,26 +166,25 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 	};
 
 	render() {
-		const { children } = this.props;
+		const { children, center } = this.props;
 		const mapProps = {
 			...this.props.mapProps,
 			...this.listeners, // eventmap 监听事件绑定
 		};
 
 		return (
-			<Box sx={{ m: 2 }}>
-				<Map
-					center={'广州市'}
-					style={{ height: '900px' }}
-					ref={(ref) => {
-						ref && ref.map ? (this.map = ref.map) : null;
-					}}
-					{...mapProps}>
-					{this.control()}
-					{this.mapvglView()}
-					{children}
-				</Map>
-			</Box>
+			<Map
+				center={center}
+				style={{ height: '100%' }}
+				mapStyleV2={{ styleId: '00b4cbb970cc388d95e664915d263104' }}
+				ref={(ref) => {
+					ref && ref.map ? (this.map = ref.map) : null;
+				}}
+				{...mapProps}>
+				{this.control()}
+				{this.mapvglView()}
+				{children}
+			</Map>
 		);
 	}
 }
@@ -180,10 +196,10 @@ BaiduMap.defaultProps = {
 	zoomControl: true,
 	useView: false,
 	mapProps: {
-		zoom: 12,
+		zoom: 4,
 		maxZoom: 22,
-		// minZoom: 12,
-		tilt: 10,
+		minZoom: 10,
+		tilt: 0,
 	},
 	mapTypeControlProps: {},
 	navigationControlProps: {},
