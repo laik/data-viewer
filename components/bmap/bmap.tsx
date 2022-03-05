@@ -13,6 +13,9 @@ export interface BMapRef {
 	view: MapVGL.View;
 	addMapvglViewLayer: (key: string, x: MapVGL.Layer) => void;
 	removeMapvglViewLayer: (key: string) => void;
+	getMapvglViewLayer: (key: string) => MapVGL.Layer;
+	disableMapvglViewLayer: (key: string) => void;
+	enableMapvglViewLayer: (key: string) => void;
 	destroyMapvglView: () => void;
 }
 
@@ -134,11 +137,25 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 		this.view.addLayer(x);
 	};
 
+	disableMapvglViewLayer = (key: string) => {
+		/** 关闭MapVGL图层  */
+		this.view.removeLayer(this.layers[key]);
+	};
+
+	enableMapvglViewLayer = (key: string) => {
+		/** 开启MapVGL图层  */
+		this.view.addLayer(this.layers[key]);
+	};
+
 	removeMapvglViewLayer = (key: string) => {
 		/** 移除MapVGL图层  */
 		this.view.removeLayer(this.layers[key]);
 		this.layers.delete(key);
 	};
+	
+	getMapvglViewLayer = (key: string) => {
+		return this.layers[key]
+	}
 
 	destroyMapvglView = () => {
 		/** 清空MapVGL图层管理器 */
