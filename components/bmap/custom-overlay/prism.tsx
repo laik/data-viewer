@@ -24,7 +24,7 @@ export interface PrismProps extends GraphyProps {
 	enableMassClear?: boolean;
 	/** 添加监听事件处理*/
 	listeners?: {
-		[event: string]: (evt: string, callback: (...args: any[]) => void) => void;
+		[event: string]: (evt: any, callback: (...args: any[]) => void) => void;
 	};
 }
 

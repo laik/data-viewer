@@ -1,4 +1,3 @@
-import Box from '@mui/material/Box';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import React from 'react';
@@ -156,19 +155,18 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 		};
 
 		return (
-			<Box sx={{ m: 2 }}>
-				<Map
-					center={'广州市'}
-					style={{ height: '900px' }}
-					ref={(ref) => {
-						ref && ref.map ? (this.map = ref.map) : null;
-					}}
-					{...mapProps}>
-					{this.control()}
-					{this.mapvglView()}
-					{children}
-				</Map>
-			</Box>
+			<Map
+				center={'广州市'}
+				style={{ height: '100%' }}
+				mapStyleV2={{ styleId: '00b4cbb970cc388d95e664915d263104' }}
+				ref={(ref) => {
+					ref && ref.map ? (this.map = ref.map) : null;
+				}}
+				{...mapProps}>
+				{this.control()}
+				{this.mapvglView()}
+				{children}
+			</Map>
 		);
 	}
 }
@@ -182,7 +180,7 @@ BaiduMap.defaultProps = {
 	mapProps: {
 		zoom: 10,
 		maxZoom: 22,
-		// minZoom: 12,
+		minZoom: 10,
 		tilt: 0,
 	},
 	mapTypeControlProps: {},
