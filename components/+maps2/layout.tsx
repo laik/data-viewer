@@ -30,21 +30,7 @@ export default class Layout extends React.Component {
     disableDistrict = () => { this.bmapRef.map.clearOverlays(); }
 
     enableDistrict = () => {
-        // const prismOpt = {
-        //     topFillColor: '#5679ea',
-        //     topFillOpacity: 0.6,
-        //     sideFillColor: '#5679ea',
-        //     sideFillOpacity: 0.9,
-        //     enableMassClear: true,
-        // };
-        // const overlay = createPrism(convert(lwold), 200, prismOpt);
-        // this.bmapRef.map.addOverlay(overlay);
-
-        this.districtPrism.
-            forEach((overlay) => {
-                console.log("overlay", overlay);
-                this.bmapRef.map.addOverlay(overlay);
-            })
+        this.districtPrism.forEach((overlay) => { this.bmapRef.map.addOverlay(overlay) })
     }
 
     displayVehicleFlow = (tracks: Tracks) => {
@@ -722,18 +708,17 @@ export default class Layout extends React.Component {
         //     });
         // } else
         if (zoom > 12) {
-            this.bmapRef.map.clearOverlays();
+            this.disableDistrict();
         } else {
-            console.log("add overlay", zoom, this.districtPrism.keys());
-            this.districtPrism.forEach((v) => {
-                this.bmapRef.map.addOverlay(v.overlay);
-            })
+            this.enableDistrict();
         }
-        if (zoom > 15) {
+
+        if (zoom > 17) {
             this.bmapRef.disableMapvglViewLayer('flow');
-            return;
+        } else {
+            this.bmapRef.enableMapvglViewLayer('flow');
         }
-        this.bmapRef.enableMapvglViewLayer('flow');
+
     }
 
     districtsAptation = (zoom: number) => {
@@ -763,12 +748,7 @@ export default class Layout extends React.Component {
     }
 
     onZoomend = (e) => {
-        // this.displayVehicleFlowadAptation(e.target.getZoom());
-    }
-
-    onZoomstart = (e) => {
         const size = e.target.getZoom();
-        this.displayVehicleFlowadAptation(size);
         if (size < 12) {
             this.bmapRef.map.setTilt(0);
         } if (size >= 12 && size < 14) {
@@ -777,39 +757,55 @@ export default class Layout extends React.Component {
             this.bmapRef.map.setTilt(55);
         }
         else if (size >= 16 && size <= 22) {
-            this.bmapRef.map.setTilt(75);
+            this.bmapRef.map.setTilt(65);
         }
+
+        this.displayVehicleFlowadAptation(size);
+    }
+
+    onZoomstart = (e) => {
+        const size = e.target.getZoom();
     }
 
     rightCilck = (e) => {
         this.zoomOut();
-        this.disableDistrict()
+        // this.disableDistrict() // 测试关闭3D矢量图层
+
+
     }
 
     leftCilck = (e) => {
         this.zoomIn();
-        this.enableDistrict()
+        // this.enableDistrict() // 测试开启3D矢量图层
+        // this.bmapRef.map.setCenter(literalToPoint(e.target.lnglat));
         console.log(
             "map zoom", this.bmapRef.map.getZoom(),
             "map evt", e,
+            "latlng", e.latlng,
         )
+        // this.bmapRef.map.setCenter(e.latlng);
     }
 
     prism = (key: number, name: string, center: Point, points: any): BMapGL.Overlay => {
         const fillColor = sRGBHex[key];
         const fillOpacity = 0;
-        const overlay = new BMapGL.Prism(points, 100, {
-            topFillColor: fillColor,
-            topFillOpacity: fillOpacity,
-            sideFillColor: fillColor,
-            sideFillOpacity: fillOpacity,
-            enableMassClear: true,
-        });
+        const overlay = new BMapGL.Prism(
+            points,
+            0,
+            {
+                topFillColor: fillColor,
+                topFillOpacity: fillOpacity,
+                sideFillColor: fillColor,
+                sideFillOpacity: fillOpacity,
+                enableMassClear: true,
+            });
 
         overlay.addEventListener('click', (e) => {
+            alert("onclick")
             this.bmapRef.map.setCenter(literalToPoint(center));
         })
         overlay.addEventListener('mouseover', (e) => {
+            // this.bmapRef.map.setCenter(literalToPoint(center));
             e.target.setTopFillColor(lighten(fillColor));
             e.target.setTopFillOpacity(0.5);
         })
