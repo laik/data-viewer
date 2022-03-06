@@ -1,3 +1,5 @@
+import sparsePoints from "./sparse";
+
 
 
 export type Point = number[];
@@ -49,7 +51,7 @@ export class Tracks {
         Object.assign(this, data);
     }
 
-    toPointList = () => {
+    pointList = () => {
         return this.
             records.
             map(record => {
@@ -60,10 +62,52 @@ export class Tracks {
                     }
                 };
                 record.a.map(point => {
-                    item.geometry.coordinates.push([point[0], point[1]]);
+                    item.geometry.coordinates.
+                        push([point[0], point[1]]);
                 })
                 return item;
             }).flat();
+    }
+
+    lastPointList = () => {
+        return this.
+            records.
+            map(record => {
+                const point = record.a.pop();
+                const coordinates = point && [point[0], point[1]];
+                return {
+                    geometry: {
+                        type: 'Point',
+                        coordinates: coordinates,
+                    }
+                };
+            }).flat();
+    }
+
+    getVid = (index: number) => {
+        return this.records[index].vid;
+    }
+
+    getPointList = (index: number) => {
+        return this.records[index].a;
+    }
+
+    getPolyLines = (index: number) => {
+        let points = this.records[index].a.map(point => {
+            return { "lng": point[0], "lat": point[1] }
+        }).flat();
+        // 轨迹抽稀
+        let _sparsePoints = sparsePoints(points, 0.0003);
+
+        console.log("src points", points.length, "sparse points", _sparsePoints.length);
+        console.log("src points", points, "sparse points", _sparsePoints);
+        return _sparsePoints.map(point =>
+            new BMapGL.Point(Number(point.lng), Number(point.lat))
+        ).flat()
+    }
+
+    getDuration = (index: number) => {
+        return (Date.parse(this.records[index].c) - Date.parse(this.records[index].b)) / 10;
     }
 }
 
