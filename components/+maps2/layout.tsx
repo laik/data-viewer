@@ -128,16 +128,16 @@ export default class Layout extends React.Component {
                         this.aniCancel();
                     }
                     const polyLinPath = tracks.getPolyLines(e.dataIndex);
-                    const duration = tracks.getDuration(e.dataIndex);
+                    const duration = (polyLinPath.length * 1500) + 2000;
                     // 声明动画对象
-                    this.disableVehicleFlow();
-                    this.disableCarPostiton();
+                    // this.disableVehicleFlow();
+                    // this.disableCarPostiton();
                     this.bmapRef.map.centerAndZoom(polyLinPath[0], 18);
                     let pl = new BMapGL.Polyline(polyLinPath,
                         {
                             strokeColor: '#FF009D',
-                            strokeWeight: 0.5,
-                            strokeOpacity: 2,
+                            strokeWeight: 2,
+                            strokeOpacity: 10,
                             strokeStyle: 'solid',
                             enableMassClear: true,
                             enableClicking: true,
@@ -147,7 +147,7 @@ export default class Layout extends React.Component {
                         this.bmapRef.map,
                         pl,
                         {
-                            duration: polyLinPath.length * 1500, // 通过轨迹行程时间计算 // 轨迹点个数*1500 回放
+                            duration: duration, // 通过轨迹行程时间计算 // 轨迹点个数*1500 回放
                             delay: 500,
                             overallView: true,
                             tilt: 70,
@@ -227,7 +227,7 @@ export default class Layout extends React.Component {
         return (
             <BaiduMap
                 center={'广州市'}
-                // styleId={'00b4cbb970cc388d95e664915d263104'}
+                styleId={'00b4cbb970cc388d95e664915d263104'}
                 ref={(ref: any) => { ref ? (this.bmapRef = ref) : null; }}
                 zoomControl={false}
                 mapTypeControl={false}
