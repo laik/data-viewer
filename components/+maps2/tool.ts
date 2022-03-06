@@ -83,6 +83,10 @@ export class Tracks {
             }).flat();
     }
 
+    getVid = (index:number) =>{
+        return this.records[index].vid;
+    }
+
     getPointList = (index: number) => {
         return this.records[index].a;
     }

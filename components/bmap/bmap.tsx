@@ -146,7 +146,7 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 
 	disableMapvglViewLayer = (key: string) => {
 		/** 关闭MapVGL图层  */
-		this.view.removeLayer(this.layers[key]);
+		this.layers[key] && this.view.removeLayer(this.layers[key]);
 	};
 
 	enableMapvglViewLayer = (key: string) => {

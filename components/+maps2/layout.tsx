@@ -4,23 +4,25 @@ import Image from 'next/image';
 import React from 'react';
 import { bind } from '../../core/utils';
 import { BaiduMap, BMapRef } from '../bmap';
-import { BMapTrackAnimation } from '../bmap/animation';
 import { withMapApi } from '../bmap/wrapper';
 import gz from './data/gz.json';
 import tracks from './data/tracks.json';
 import { convert, literalToPoint, Point, Region, sRGBHex, Tracks } from './tool';
+const mapvgl = require('mapvgl');
 
 export function Car() {
     return <Image src="./car.svg" alt="car" width="64" height="64" />
 }
 
-const mapvgl = require('mapvgl');
+const car = require('./vehicle.png');
+
 @withMapApi
 @bind()
 export default class Layout extends React.Component {
     @observable bmapRef: BMapRef = null;
     @observable districtPrism = observable.map({});
-    @observable ani = null;
+    @observable ani: BMapGLLib.TrackAnimation = null;
+    @observable aniCancel = null;
 
     setzoom = (size: number) => { this.bmapRef.map.setZoom(size) }
     getzoom = (): number => { return this.bmapRef.map.getZoom() }
@@ -38,7 +40,7 @@ export default class Layout extends React.Component {
     displayVehicleFlow = (tracks: Tracks) => {
         this.bmapRef.addMapvglViewLayer('flow',
             new mapvgl.LineFlowLayer({
-                color: 'rgb(184, 247, 5)',
+                color: '#B8E90B',
                 interval: 0.6,
                 duration: 3,
                 trailLength: 1,
@@ -60,7 +62,7 @@ export default class Layout extends React.Component {
         }
 
         if (zoom > 14) {
-            this.disableVehicleFlow();
+            // this.disableVehicleFlow();
             this.enableCarPostiton();
         } else {
             this.enableVehicleFlow();
@@ -106,13 +108,13 @@ export default class Layout extends React.Component {
         const size = e.target.getZoom();
     }
 
-    rightCilck = (e) => { this.ani && this.ani.cancel(); this.zoomOut(); }
+    rightCilck = (e) => { this.ani && this.aniCancel(); this.zoomOut(); }
     leftdbCilck = (e) => { this.zoomIn(); }
 
     displayCarPostiton = (tracks: Tracks) => {
         this.bmapRef.putMapvglViewLayer('car',
             new mapvgl.IconLayer({
-                icon: Car.name,
+                icon: './vehicle.png',
                 enablePicked: true, // 是否可以拾取
                 autoSelect: true, // 根据鼠标位置来自动设置选中项
                 // flat: true,   // 平躺在地面上
@@ -120,42 +122,48 @@ export default class Layout extends React.Component {
                 // opacity: 0.8,
                 data: tracks.lastPointList(),
                 onClick: (e) => { // 点击事件
-                    console.log("----?", e)
-                    if (e.dataIndex === -1) {
-                        return;
+                    if (e.dataIndex === -1) { return }
+                    alert(`播放vid${tracks.getVid(e.dataIndex)}...`);
+                    if (this.ani) {
+                        this.aniCancel();
                     }
-                    alert(`点击了第${e.dataIndex}个点`);
                     const polyLinPath = tracks.getPolyLines(e.dataIndex);
-                    const duration = tracks.getDuration(e.dataIndex) / 15;
-
-
+                    const duration = tracks.getDuration(e.dataIndex) / 20;
                     // 声明动画对象
-                    this.disableVehicleFlow();
+                    // this.disableVehicleFlow();
+                    this.disableCarPostiton();
+                    this.bmapRef.map.centerAndZoom(polyLinPath[0], 18);
+                    let pl = new BMapGL.Polyline(polyLinPath,
+                        {
+                            strokeColor: '#E0DCBE',
+                            strokeWeight: 0.5,
+                            strokeOpacity: 0.8,
+                            // strokeStyle: 'solid',
+                            enableMassClear: true,
+                            enableClicking: true,
+                        }
+                    )
                     this.ani = new BMapGLLib.TrackAnimation(
                         this.bmapRef.map,
-                        new BMapGL.Polyline(polyLinPath,
-                            {
-                                strokeColor: '#B8F705',
-                                strokeWeight: 1,
-                                strokeOpacity: 1,
-                                strokeStyle: 'solid',
-                                // enableMassClear: true,
-                                // enableEditing: false,
-                                enableClicking: true,
-                            }
-                        ),
+                        pl,
                         {
                             duration: duration, // 通过轨迹行程时间计算
                             delay: 500,
                             overallView: true,
-                            tilt: 60,
+                            tilt: 75,
                             zoom: 19.5,
                         });
                     // 监听事件                    
                     // 开始播放动画
                     this.ani.start();
-                    setTimeout(() => {
+                    this.aniCancel = () => {
+                        if (!this.ani) { return; }
                         this.ani.cancel();
+                        this.bmapRef.map.removeOverlay(pl);
+                        this.ani = null;
+                    }
+                    setTimeout(() => {
+                        this.aniCancel();
                     }, duration);
 
                 },
@@ -169,17 +177,13 @@ export default class Layout extends React.Component {
     prism = (key: number, name: string, center: Point, points: any): BMapGL.Overlay => {
         const fillColor = sRGBHex[key];
         const fillOpacity = 0;
-        const overlay = new BMapGL.Prism(
-            points,
-            0,
-            {
-                topFillColor: fillColor,
-                topFillOpacity: fillOpacity,
-                sideFillColor: fillColor,
-                sideFillOpacity: fillOpacity,
-                enableMassClear: true,
-            });
-
+        const overlay = new BMapGL.Prism(points, 0, {
+            topFillColor: fillColor,
+            topFillOpacity: fillOpacity,
+            sideFillColor: fillColor,
+            sideFillOpacity: fillOpacity,
+            enableMassClear: true,
+        });
         overlay.addEventListener('click', (e) => {
             this.bmapRef.map.centerAndZoom(
                 literalToPoint(center),
@@ -203,16 +207,13 @@ export default class Layout extends React.Component {
             const feature = region.features[i];
             const { geometry, properties } = feature;
             const { coordinates } = geometry;
-
             for (let j = 0; j < coordinates.length; j++) {
                 const coordinate = coordinates[j];
                 for (let k = 0; k < coordinate.length; k++) {
                     const area = coordinate[k];
                     this.districtPrism.set(
                         properties.name,
-                        this.prism(
-                            i,
-                            properties.name,
+                        this.prism(i, properties.name,
                             properties.center,
                             convert(area),
                         )
@@ -221,22 +222,6 @@ export default class Layout extends React.Component {
             }
         }
     }
-
-    trackAnimation = (data: any[]): JSX.Element => {
-        let path = [];
-        for (let i = 0; i < data.length; i++) {
-            path.push(new BMapGL.Point(Number(data[i][0]), Number(data[i][1])));
-        }
-        return (
-            <BMapTrackAnimation
-                poyline={new BMapGL.Polyline(path)}
-                overallView={true}
-                tilt={30}
-                duration={20000}
-                delay={3000}
-            />
-        );
-    };
 
     render() {
         return (
