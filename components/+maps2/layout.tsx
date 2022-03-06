@@ -168,8 +168,8 @@ export default class Layout extends React.Component {
                         this.ani = null;
                         this.enableCarPostiton();
                         this.enableVehicleFlow();
-                        this.enableDistrict();
-                        this.bmapRef.map.centerAndZoom(polyLinPath[0], 12);
+                        // this.enableDistrict();
+                        this.bmapRef.map.centerAndZoom(polyLinPath[0], 14);
                     }
                     setTimeout(() => {
                         this.aniCancel();
