@@ -139,13 +139,13 @@ export default class Layout extends React.Component {
         this.bmapRef.putMapvglViewLayer(
             'car',
             new mapvgl.IconLayer({
-                icon: '/marker.png',
-                width: 100 / 2,
-                height: 153 / 2,
+                icon: '/vehicle1.png',
+                width: 30,
+                height: 30,
                 // offset: [0, -153 / 2 / 2],
                 enablePicked: true, // 是否可以拾取
                 autoSelect: true, // 根据鼠标位置来自动设置选中项
-                // flat: true,   // 平躺在地面上
+                flat: false,   // 平躺在地面上
                 selectedColor: '#B8F705', // 选中项颜色
                 angle: 1,
                 // opacity: 0.8,
@@ -202,6 +202,11 @@ export default class Layout extends React.Component {
                         this.aniCancel();
                     }, duration + 2000);
                 },
+                onMousemove: (e) => {
+                    if (e.dataIndex === -1) { return }
+                    console.log("---", e);
+                    // 可以添加文字图层显示车量信息
+                }
             })
         );
     };
