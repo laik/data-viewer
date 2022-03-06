@@ -128,9 +128,9 @@ export default class Layout extends React.Component {
                         this.aniCancel();
                     }
                     const polyLinPath = tracks.getPolyLines(e.dataIndex);
-                    const duration = tracks.getDuration(e.dataIndex) ;
+                    const duration = tracks.getDuration(e.dataIndex);
                     // 声明动画对象
-                    // this.disableVehicleFlow();
+                    this.disableVehicleFlow();
                     this.disableCarPostiton();
                     this.bmapRef.map.centerAndZoom(polyLinPath[0], 18);
                     let pl = new BMapGL.Polyline(polyLinPath,
@@ -147,11 +147,11 @@ export default class Layout extends React.Component {
                         this.bmapRef.map,
                         pl,
                         {
-                            duration: duration, // 通过轨迹行程时间计算
+                            duration: polyLinPath.length * 1500, // 通过轨迹行程时间计算 // 轨迹点个数*1500 回放
                             delay: 500,
                             overallView: true,
-                            tilt: 75,
-                            zoom: 19.5,
+                            tilt: 70,
+                            zoom: 18,
                         });
                     // 监听事件                    
                     // 开始播放动画
@@ -227,7 +227,7 @@ export default class Layout extends React.Component {
         return (
             <BaiduMap
                 center={'广州市'}
-                styleId={'7e65c2caad216624f9c4a03e1f012b23'}
+                // styleId={'00b4cbb970cc388d95e664915d263104'}
                 ref={(ref: any) => { ref ? (this.bmapRef = ref) : null; }}
                 zoomControl={false}
                 mapTypeControl={false}
