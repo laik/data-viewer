@@ -11,6 +11,7 @@ import Map, { MapProps } from 'react-bmapgl/Map';
 export interface BMapRef {
 	map: BMapGL.Map;
 	view: MapVGL.View;
+	putMapvglViewLayer: (key: string, x: MapVGL.Layer) => void; // just add no enable display
 	addMapvglViewLayer: (key: string, x: MapVGL.Layer) => void;
 	removeMapvglViewLayer: (key: string) => void;
 	getMapvglViewLayer: (key: string) => MapVGL.Layer;
@@ -138,6 +139,11 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 		this.view.addLayer(x);
 	};
 
+	putMapvglViewLayer = (key: string, x: MapVGL.Layer) => {
+		/** 添加MapVGL图层  */
+		this.layers[key] = x;
+	};
+
 	disableMapvglViewLayer = (key: string) => {
 		/** 关闭MapVGL图层  */
 		this.view.removeLayer(this.layers[key]);
@@ -145,7 +151,7 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 
 	enableMapvglViewLayer = (key: string) => {
 		/** 开启MapVGL图层  */
-		this.view.addLayer(this.layers[key]);
+		this.layers[key] && this.view.addLayer(this.layers[key]);
 	};
 
 	removeMapvglViewLayer = (key: string) => {

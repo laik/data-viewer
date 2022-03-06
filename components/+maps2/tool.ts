@@ -1,5 +1,6 @@
 
 
+
 export type Point = number[];
 export type Points = Point[];
 
@@ -49,7 +50,7 @@ export class Tracks {
         Object.assign(this, data);
     }
 
-    toPointList = () => {
+    pointList = () => {
         return this.
             records.
             map(record => {
@@ -60,10 +61,40 @@ export class Tracks {
                     }
                 };
                 record.a.map(point => {
-                    item.geometry.coordinates.push([point[0], point[1]]);
+                    item.geometry.coordinates.
+                        push([point[0], point[1]]);
                 })
                 return item;
             }).flat();
+    }
+
+    lastPointList = () => {
+        return this.
+            records.
+            map(record => {
+                const point = record.a.pop();
+                const coordinates = point && [point[0], point[1]];
+                return {
+                    geometry: {
+                        type: 'Point',
+                        coordinates: coordinates,
+                    }
+                };
+            }).flat();
+    }
+
+    getPointList = (index: number) => {
+        return this.records[index].a;
+    }
+
+    getPolyLines = (index: number) => {
+        return this.records[index].a.
+            map(point => new BMapGL.Point(Number(point[0]), Number(point[1]))).
+            flat()
+    }
+
+    getDuration = (index: number) => {
+        return Date.parse(this.records[index].c) - Date.parse(this.records[index].b);
     }
 }
 
