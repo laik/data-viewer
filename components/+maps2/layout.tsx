@@ -23,12 +23,12 @@ export default class Layout extends React.Component {
     @observable districtPrism = observable.map({});
     @observable ani: BMapGLLib.TrackAnimation = null;
     @observable aniCancel = null;
+    @observable holding = false;
 
     setzoom = (size: number) => { this.bmapRef.map.setZoom(size) }
     getzoom = (): number => { return this.bmapRef.map.getZoom() }
     zoomOut = () => { this.setzoom(this.getzoom() - 2) }
     zoomIn = () => { this.setzoom(this.getzoom() + 2) }
-
     // 关闭行政区域覆盖
     disableDistrict = () => { this.bmapRef.map.clearOverlays(); }
     // 开启行政区域覆盖
@@ -61,12 +61,14 @@ export default class Layout extends React.Component {
             this.enableDistrict();
         }
 
-        if (zoom > 14) {
-            // this.disableVehicleFlow();
-            this.enableCarPostiton();
-        } else {
-            this.enableVehicleFlow();
-            this.disableCarPostiton();
+        if (!this.holding) {
+            if (zoom > 14) {
+                // this.disableVehicleFlow();
+                this.enableCarPostiton();
+            } else {
+                // this.enableVehicleFlow();
+                this.disableCarPostiton();
+            }
         }
     }
 
@@ -127,11 +129,13 @@ export default class Layout extends React.Component {
                     if (this.ani) {
                         this.aniCancel();
                     }
+                    this.holding = true;
                     const polyLinPath = tracks.getPolyLines(e.dataIndex);
-                    const duration = (polyLinPath.length * 1500) + 2000;
+                    const duration = (polyLinPath.length * 1500) + 500;
                     // 声明动画对象
-                    // this.disableVehicleFlow();
-                    // this.disableCarPostiton();
+                    this.disableVehicleFlow();
+                    this.disableCarPostiton();
+                    this.disableDistrict();
                     this.bmapRef.map.centerAndZoom(polyLinPath[0], 18);
                     let pl = new BMapGL.Polyline(polyLinPath,
                         {
@@ -148,23 +152,28 @@ export default class Layout extends React.Component {
                         pl,
                         {
                             duration: duration, // 通过轨迹行程时间计算 // 轨迹点个数*1500 回放
-                            delay: 500,
+                            delay: 800,
                             overallView: true,
-                            tilt: 70,
+                            // tilt: 70,
                             zoom: 18,
                         });
                     // 监听事件                    
                     // 开始播放动画
                     this.ani.start();
                     this.aniCancel = () => {
+                        this.holding = false;
                         if (!this.ani) { return; }
                         this.ani.cancel();
                         this.bmapRef.map.removeOverlay(pl);
                         this.ani = null;
+                        this.enableCarPostiton();
+                        this.enableVehicleFlow();
+                        this.enableDistrict();
+                        this.bmapRef.map.centerAndZoom(polyLinPath[0], 12);
                     }
                     setTimeout(() => {
                         this.aniCancel();
-                    }, duration);
+                    }, duration + 2000);
 
                 },
             }),
