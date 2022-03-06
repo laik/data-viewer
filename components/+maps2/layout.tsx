@@ -128,17 +128,17 @@ export default class Layout extends React.Component {
                         this.aniCancel();
                     }
                     const polyLinPath = tracks.getPolyLines(e.dataIndex);
-                    const duration = tracks.getDuration(e.dataIndex) / 20;
+                    const duration = tracks.getDuration(e.dataIndex) ;
                     // 声明动画对象
                     // this.disableVehicleFlow();
                     this.disableCarPostiton();
                     this.bmapRef.map.centerAndZoom(polyLinPath[0], 18);
                     let pl = new BMapGL.Polyline(polyLinPath,
                         {
-                            strokeColor: '#E0DCBE',
+                            strokeColor: '#FF009D',
                             strokeWeight: 0.5,
-                            strokeOpacity: 0.8,
-                            // strokeStyle: 'solid',
+                            strokeOpacity: 2,
+                            strokeStyle: 'solid',
                             enableMassClear: true,
                             enableClicking: true,
                         }
@@ -227,6 +227,7 @@ export default class Layout extends React.Component {
         return (
             <BaiduMap
                 center={'广州市'}
+                styleId={'7e65c2caad216624f9c4a03e1f012b23'}
                 ref={(ref: any) => { ref ? (this.bmapRef = ref) : null; }}
                 zoomControl={false}
                 mapTypeControl={false}

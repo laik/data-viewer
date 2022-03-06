@@ -67,6 +67,7 @@ export interface BaiduMapProps {
 	navigationControlProps?: ControlProps;
 	scaleControlProps?: ControlProps;
 	zoomControlProps?: ControlProps;
+	styleId?: string;
 	/** 添加监听事件处理*/
 	listeners?: {
 		[key: string]: (evt) => void;
@@ -172,7 +173,7 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 	};
 
 	render() {
-		const { children, center } = this.props;
+		const { children, center, styleId } = this.props;
 		const mapProps = {
 			...this.props.mapProps,
 			...this.listeners, // eventmap 监听事件绑定
@@ -182,7 +183,7 @@ export class BaiduMap extends React.Component<BaiduMapProps> {
 			<Map
 				center={center}
 				style={{ height: '100%' }}
-				mapStyleV2={{ styleId: '00b4cbb970cc388d95e664915d263104' }}
+				mapStyleV2={{ styleId: styleId }}
 				ref={(ref) => {
 					ref && ref.map ? (this.map = ref.map) : null;
 				}}

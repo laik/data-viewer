@@ -1,3 +1,4 @@
+import sparsePoints from "./sparse";
 
 
 
@@ -83,7 +84,7 @@ export class Tracks {
             }).flat();
     }
 
-    getVid = (index:number) =>{
+    getVid = (index: number) => {
         return this.records[index].vid;
     }
 
@@ -92,13 +93,21 @@ export class Tracks {
     }
 
     getPolyLines = (index: number) => {
-        return this.records[index].a.
-            map(point => new BMapGL.Point(Number(point[0]), Number(point[1]))).
-            flat()
+        let points = this.records[index].a.map(point => {
+            return { "lng": point[0], "lat": point[1] }
+        }).flat();
+        // 轨迹抽稀
+        let _sparsePoints = sparsePoints(points, 0.0003);
+
+        console.log("src points", points.length, "sparse points", _sparsePoints.length);
+        console.log("src points", points, "sparse points", _sparsePoints);
+        return _sparsePoints.map(point =>
+            new BMapGL.Point(Number(point.lng), Number(point.lat))
+        ).flat()
     }
 
     getDuration = (index: number) => {
-        return Date.parse(this.records[index].c) - Date.parse(this.records[index].b);
+        return (Date.parse(this.records[index].c) - Date.parse(this.records[index].b)) / 10;
     }
 }
 
