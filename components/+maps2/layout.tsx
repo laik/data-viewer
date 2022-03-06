@@ -1,20 +1,20 @@
 import { lighten } from '@jiaminghi/color';
 import { observable } from 'mobx';
-import Image from 'next/image';
 import React from 'react';
 import { bind } from '../../core/utils';
 import { BaiduMap, BMapRef } from '../bmap';
 import { withMapApi } from '../bmap/wrapper';
 import gz from './data/gz.json';
 import tracks from './data/tracks.json';
-import { convert, literalToPoint, Point, Region, sRGBHex, Tracks } from './tool';
+import {
+    convert,
+    literalToPoint,
+    Point,
+    Region,
+    sRGBHex,
+    Tracks
+} from './tool';
 const mapvgl = require('mapvgl');
-
-export function Car() {
-    return <Image src="./car.svg" alt="car" width="64" height="64" />
-}
-
-const car = require('./vehicle.png');
 
 @withMapApi
 @bind()
@@ -25,20 +25,34 @@ export default class Layout extends React.Component {
     @observable aniCancel = null;
     @observable holding = false;
 
-    setzoom = (size: number) => { this.bmapRef.map.setZoom(size) }
-    getzoom = (): number => { return this.bmapRef.map.getZoom() }
-    zoomOut = () => { this.setzoom(this.getzoom() - 2) }
-    zoomIn = () => { this.setzoom(this.getzoom() + 2) }
+    setzoom = (size: number) => {
+        this.bmapRef.map.setZoom(size);
+    };
+    getzoom = (): number => {
+        return this.bmapRef.map.getZoom();
+    };
+    zoomOut = () => {
+        this.setzoom(this.getzoom() - 2);
+    };
+    zoomIn = () => {
+        this.setzoom(this.getzoom() + 2);
+    };
+
     // 关闭行政区域覆盖
-    disableDistrict = () => { this.bmapRef.map.clearOverlays(); }
+    disableDistrict = () => {
+        this.bmapRef.map.clearOverlays();
+    };
     // 开启行政区域覆盖
     enableDistrict = () => {
-        this.districtPrism.forEach((overlay) => { this.bmapRef.map.addOverlay(overlay) })
-    }
+        this.districtPrism.forEach((overlay) => {
+            this.bmapRef.map.addOverlay(overlay);
+        });
+    };
 
     // 显示车流
     displayVehicleFlow = (tracks: Tracks) => {
-        this.bmapRef.addMapvglViewLayer('flow',
+        this.bmapRef.addMapvglViewLayer(
+            'flow',
             new mapvgl.LineFlowLayer({
                 color: '#B8E90B',
                 interval: 0.6,
@@ -47,11 +61,15 @@ export default class Layout extends React.Component {
                 data: tracks.pointList(),
             })
         );
-    }
+    };
     //关闭车流
-    disableVehicleFlow = () => { this.bmapRef.disableMapvglViewLayer('flow') }
+    disableVehicleFlow = () => {
+        this.bmapRef.disableMapvglViewLayer('flow');
+    };
     //开启车流
-    enableVehicleFlow = () => { this.bmapRef.enableMapvglViewLayer('flow') }
+    enableVehicleFlow = () => {
+        this.bmapRef.enableMapvglViewLayer('flow');
+    };
 
     displayVehicleFlowadAptation = (zoom: number) => {
         console.log("displayVehicleFlowadAptation", zoom);
@@ -72,7 +90,7 @@ export default class Layout extends React.Component {
         }
     }
 
-    districtsAptation = (zoom: number) => { }
+    districtsAptation = (zoom: number) => { };
 
     mapLoaded = (e) => {
         //初始化3D矢量图层
@@ -87,8 +105,8 @@ export default class Layout extends React.Component {
         this.displayCarPostiton(_tracks);
 
         // this.enableCarPostiton();
-        this.bmapRef.map.enableContinuousZoom()
-    }
+        this.bmapRef.map.enableContinuousZoom();
+    };
 
     onZoomend = (e) => {
         const size = e.target.getZoom();
@@ -99,31 +117,40 @@ export default class Layout extends React.Component {
             this.bmapRef.map.setTilt(30);
         } else if (size >= 14 && size < 16) {
             this.bmapRef.map.setTilt(55);
-        }
-        else if (size >= 16 && size <= 22) {
+        } else if (size >= 16 && size <= 22) {
             this.bmapRef.map.setTilt(65);
         }
         this.displayVehicleFlowadAptation(size);
-    }
+    };
 
     onZoomstart = (e) => {
         const size = e.target.getZoom();
-    }
+    };
 
-    rightCilck = (e) => { this.ani && this.aniCancel(); this.zoomOut(); }
-    leftdbCilck = (e) => { this.zoomIn(); }
+    rightCilck = (e) => {
+        this.ani && this.aniCancel();
+        this.zoomOut();
+    };
+    leftdbCilck = (e) => {
+        this.zoomIn();
+    };
 
     displayCarPostiton = (tracks: Tracks) => {
-        this.bmapRef.putMapvglViewLayer('car',
+        this.bmapRef.putMapvglViewLayer(
+            'car',
             new mapvgl.IconLayer({
-                icon: './vehicle.png',
+                icon: '/marker.png',
+                width: 100 / 2,
+                height: 153 / 2,
+                // offset: [0, -153 / 2 / 2],
                 enablePicked: true, // 是否可以拾取
                 autoSelect: true, // 根据鼠标位置来自动设置选中项
                 // flat: true,   // 平躺在地面上
                 selectedColor: '#B8F705', // 选中项颜色
+                angle: 1,
                 // opacity: 0.8,
                 data: tracks.lastPointList(),
-                onClick: (e) => { // 点击事件
+                onClick: (e) => {
                     if (e.dataIndex === -1) { return }
                     alert(`播放vid${tracks.getVid(e.dataIndex)}...`);
                     if (this.ani) {
@@ -174,16 +201,24 @@ export default class Layout extends React.Component {
                     setTimeout(() => {
                         this.aniCancel();
                     }, duration + 2000);
-
                 },
-            }),
+            })
         );
-    }
+    };
 
-    enableCarPostiton = () => { this.bmapRef.enableMapvglViewLayer('car') }
-    disableCarPostiton = () => { this.bmapRef.disableMapvglViewLayer('car') }
+    enableCarPostiton = () => {
+        this.bmapRef.enableMapvglViewLayer('car');
+    };
+    disableCarPostiton = () => {
+        this.bmapRef.disableMapvglViewLayer('car');
+    };
 
-    prism = (key: number, name: string, center: Point, points: any): BMapGL.Overlay => {
+    prism = (
+        key: number,
+        name: string,
+        center: Point,
+        points: any
+    ): BMapGL.Overlay => {
         const fillColor = sRGBHex[key];
         const fillOpacity = 0;
         const overlay = new BMapGL.Prism(points, 0, {
@@ -196,20 +231,19 @@ export default class Layout extends React.Component {
         overlay.addEventListener('click', (e) => {
             this.bmapRef.map.centerAndZoom(
                 literalToPoint(center),
-                this.getzoom() > 12 ? this.getzoom() : 12,
+                this.getzoom() > 12 ? this.getzoom() : 12
             );
-        })
+        });
         overlay.addEventListener('mouseover', (e) => {
             e.target.setTopFillColor(lighten(fillColor));
             e.target.setTopFillOpacity(0.5);
-        })
+        });
         overlay.addEventListener('mouseout', (e) => {
             e.target.setTopFillColor(fillColor);
             e.target.setTopFillOpacity(fillOpacity);
-        })
+        });
         return overlay;
-    }
-
+    };
 
     initDistrictsPrism = (region: Region) => {
         for (let i = 0; i < region.features.length; i++) {
@@ -222,22 +256,21 @@ export default class Layout extends React.Component {
                     const area = coordinate[k];
                     this.districtPrism.set(
                         properties.name,
-                        this.prism(i, properties.name,
-                            properties.center,
-                            convert(area),
-                        )
+                        this.prism(i, properties.name, properties.center, convert(area))
                     );
                 }
             }
         }
-    }
+    };
 
     render() {
         return (
             <BaiduMap
                 center={'广州市'}
                 styleId={'00b4cbb970cc388d95e664915d263104'}
-                ref={(ref: any) => { ref ? (this.bmapRef = ref) : null; }}
+                ref={(ref: any) => {
+                    ref ? (this.bmapRef = ref) : null;
+                }}
                 zoomControl={false}
                 mapTypeControl={false}
                 scaleControl={false}
@@ -248,8 +281,8 @@ export default class Layout extends React.Component {
                     onLoad: this.mapLoaded,
                     onZoomend: this.onZoomend,
                     onZoomstart: this.onZoomstart,
-                }}>
-            </BaiduMap>
+                }}
+            />
         );
     }
 }
