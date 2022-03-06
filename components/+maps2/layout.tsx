@@ -153,10 +153,10 @@ export default class Layout extends React.Component {
                 onClick: (e) => {
                     if (e.dataIndex === -1) { return }
                     alert(`播放vid${tracks.getVid(e.dataIndex)}...`);
+                    this.holding = true;
                     if (this.ani) {
                         this.aniCancel();
                     }
-                    this.holding = true;
                     const polyLinPath = tracks.getPolyLines(e.dataIndex);
                     const duration = (polyLinPath.length * 1500) + 500;
                     // 声明动画对象
@@ -169,7 +169,7 @@ export default class Layout extends React.Component {
                             strokeColor: '#FF009D',
                             strokeWeight: 2,
                             strokeOpacity: 10,
-                            strokeStyle: 'solid',
+                            strokeStyle: 'dashed',//dashed,solid
                             enableMassClear: true,
                             enableClicking: true,
                         }
