@@ -1,6 +1,6 @@
 import { MapApiLoaderHOC } from 'react-bmapgl/Map';
 
-export const AK = 'l1i69UZi7aKCrzchRYRvPuUUQSvupFYO';
+export const AK = 'dP40El8LK8pC14ebyDKU8BflPXpw2vhG';
 
 const loadTrackAnimationJS = () => {
 	const script = document.createElement('script');

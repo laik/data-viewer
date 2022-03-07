@@ -4,8 +4,9 @@ import React from 'react';
 import { bind } from '../../core/utils';
 import { BaiduMap, BMapRef } from '../bmap';
 import { withMapApi } from '../bmap/wrapper';
-import gz from './data/gz.json';
-import tracks from './data/tracks.json';
+import yuxicity from './data/yuxi-city.json';
+import tracks from './data/yuxi-tracks.json';
+import yuxi from './data/yuxi.json';
 import {
     convert,
     literalToPoint,
@@ -24,6 +25,7 @@ export default class Layout extends React.Component {
     @observable ani: BMapGLLib.TrackAnimation = null;
     @observable aniCancel = null;
     @observable holding = false;
+    @observable cityName = "玉溪市";
 
     setzoom = (size: number) => {
         this.bmapRef.map.setZoom(size);
@@ -94,7 +96,10 @@ export default class Layout extends React.Component {
 
     mapLoaded = (e) => {
         //初始化3D矢量图层
-        this.initDistrictsPrism(gz);
+        this.initDistrictsPrism(yuxi);
+        // 
+        this.initCityMarker();
+        let _ = yuxicity;
         //开启3D矢量图层
         this.enableDistrict();
 
@@ -152,7 +157,7 @@ export default class Layout extends React.Component {
                 data: tracks.lastPointList(),
                 onClick: (e) => {
                     if (e.dataIndex === -1) { return }
-                    alert(`播放vid${tracks.getVid(e.dataIndex)}...`);
+                    // alert(`播放vid${tracks.getVid(e.dataIndex)}...`);
                     this.holding = true;
                     if (this.ani) {
                         this.aniCancel();
@@ -179,9 +184,8 @@ export default class Layout extends React.Component {
                         pl,
                         {
                             duration: duration, // 通过轨迹行程时间计算 // 轨迹点个数*1500 回放
-                            delay: 800,
+                            delay: 1000,
                             overallView: true,
-                            // tilt: 70,
                             zoom: 18,
                         });
                     // 监听事件                    
@@ -260,18 +264,43 @@ export default class Layout extends React.Component {
                 for (let k = 0; k < coordinate.length; k++) {
                     const area = coordinate[k];
                     this.districtPrism.set(
-                        properties.name,
-                        this.prism(i, properties.name, properties.center, convert(area))
+                        properties.name + j, //同一个行政区会有多个prism组成
+                        this.prism(i,
+                            properties.name,
+                            properties.center,
+                            convert(area),
+                        )
                     );
                 }
             }
         }
     };
 
+    initCityMarker = () => { new BMapGL.Boundary().get(this.cityName, this.city); }
+
+    city = (rs: any) => {
+        var count = rs.boundaries.length; //行政区域的点有多少个
+        for (var i = 0; i < count; i++) {
+            var ply = new BMapGL.Polygon(
+                rs.boundaries[i],
+                {
+                    strokeWeight: 0,
+                    strokeColor: "#262626",
+                    fillColor: "#262626",
+                    strokeOpacity: 0.1,
+                    enableMassClear: false,
+                    enableClicking: false,
+                }); //建立多边形覆盖物
+            this.bmapRef.map.addOverlay(ply);  //添加覆盖物
+            this.bmapRef.map.setViewport(ply.getPath());    //调整视野         
+        }
+    }
+
+
     render() {
         return (
             <BaiduMap
-                center={'广州市'}
+                center={this.cityName}
                 styleId={'00b4cbb970cc388d95e664915d263104'}
                 ref={(ref: any) => {
                     ref ? (this.bmapRef = ref) : null;
