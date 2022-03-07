@@ -92,16 +92,17 @@ export class Tracks {
         return this.records[index].a;
     }
 
+    getLastPoint = (index: number): BMapGL.Point => {
+        const point = this.records[index].a[this.records[index].a.length - 1];
+        return new BMapGL.Point(Number(point[0]), Number(point[1]))
+    }
+
     getPolyLines = (index: number) => {
         let points = this.records[index].a.map(point => {
             return { "lng": point[0], "lat": point[1] }
         }).flat();
         // 轨迹抽稀
-        let _sparsePoints = sparsePoints(points, 0.0003);
-
-        console.log("src points", points.length, "sparse points", _sparsePoints.length);
-        console.log("src points", points, "sparse points", _sparsePoints);
-        return _sparsePoints.map(point =>
+        return sparsePoints(points, 0.0002).map(point =>
             new BMapGL.Point(Number(point.lng), Number(point.lat))
         ).flat()
     }

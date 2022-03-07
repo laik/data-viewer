@@ -59,7 +59,7 @@ export default class Layout extends React.Component {
             new mapvgl.LineFlowLayer({
                 color: '#B8E90B',
                 interval: 0.6,
-                duration: 3,
+                duration: 4,
                 trailLength: 1,
                 data: tracks.pointList(),
             })
@@ -144,13 +144,12 @@ export default class Layout extends React.Component {
     };
 
     displayCarPostiton = (tracks: Tracks) => {
-        this.bmapRef.putMapvglViewLayer(
-            'car',
+        let infoWindow;
+        this.bmapRef.putMapvglViewLayer('car',
             new mapvgl.IconLayer({
                 icon: '/vehicle1.png',
                 width: 30,
                 height: 30,
-                // offset: [0, -153 / 2 / 2],
                 enablePicked: true, // 是否可以拾取
                 autoSelect: true, // 根据鼠标位置来自动设置选中项
                 flat: false,   // 平躺在地面上
@@ -210,9 +209,20 @@ export default class Layout extends React.Component {
                     }, duration + 2000);
                 },
                 onMousemove: (e) => {
-                    if (e.dataIndex === -1) { return }
-                    console.log("---", e);
-                    // 可以添加文字图层显示车量信息
+                    // if (e.dataIndex === -1) { infoWindow && this.bmapRef.map.closeInfoWindow(); return }
+                    // infoWindow = new BMapGL.InfoWindow(`
+                    //     <div>
+                    //     <h6>
+                    //     车量ID：${tracks.getVid(e.dataIndex)}，当前状态:.....
+                    //     </h6>
+                    //     </div>`,
+                    //     { width: 20, height: 20 }
+                    // );
+                    // this.bmapRef.map.
+                    //     openInfoWindow(infoWindow, tracks.getLastPoint(e.dataIndex));
+                },
+                onMouseover: (e) => {
+
                 }
             })
         );
@@ -284,15 +294,11 @@ export default class Layout extends React.Component {
     }
 
     disableCityMarker = () => {
-        this.cityPly.forEach(city => {
-            this.bmapRef.map.removeOverlay(city);  //添加覆盖物
-        });
+        this.cityPly.forEach(city => { this.bmapRef.map.removeOverlay(city); });//移除覆盖物
     }
 
     enableCityMarker = () => {
-        this.cityPly.forEach(city => {
-            this.bmapRef.map.addOverlay(city);  //添加覆盖物      
-        })
+        this.cityPly.forEach(city => { this.bmapRef.map.addOverlay(city); })//添加覆盖物      
     }
 
     city = (rs: any) => {
