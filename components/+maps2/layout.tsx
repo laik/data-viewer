@@ -26,6 +26,7 @@ export default class Layout extends React.Component {
     @observable aniCancel = null;
     @observable holding = false;
     @observable cityName = "玉溪市";
+    @observable cityPly = observable.map({});
 
     setzoom = (size: number) => {
         this.bmapRef.map.setZoom(size);
@@ -77,8 +78,10 @@ export default class Layout extends React.Component {
         console.log("displayVehicleFlowadAptation", zoom);
         if (zoom > 12) {
             this.disableDistrict();
+            this.disableCityMarker();
         } else {
             this.enableDistrict();
+            this.enableCityMarker();
         }
 
         if (!this.holding) {
@@ -163,7 +166,7 @@ export default class Layout extends React.Component {
                         this.aniCancel();
                     }
                     const polyLinPath = tracks.getPolyLines(e.dataIndex);
-                    const duration = (polyLinPath.length * 1500) + 500;
+                    const duration = (polyLinPath.length * 1300) + 500;
                     // 声明动画对象
                     this.disableVehicleFlow();
                     this.disableCarPostiton();
@@ -276,24 +279,39 @@ export default class Layout extends React.Component {
         }
     };
 
-    initCityMarker = () => { new BMapGL.Boundary().get(this.cityName, this.city); }
+    initCityMarker = () => {
+        new BMapGL.Boundary().get(this.cityName, this.city);
+    }
+
+    disableCityMarker = () => {
+        this.cityPly.forEach(city => {
+            this.bmapRef.map.removeOverlay(city);  //添加覆盖物
+        });
+    }
+
+    enableCityMarker = () => {
+        this.cityPly.forEach(city => {
+            this.bmapRef.map.addOverlay(city);  //添加覆盖物      
+        })
+    }
 
     city = (rs: any) => {
-        var count = rs.boundaries.length; //行政区域的点有多少个
-        for (var i = 0; i < count; i++) {
-            var ply = new BMapGL.Polygon(
+        const count = rs.boundaries.length; //行政区域的点有多少个
+        for (let i = 0; i < count; i++) {
+            let ply = new BMapGL.Polygon(
                 rs.boundaries[i],
                 {
                     strokeWeight: 0,
                     strokeColor: "#262626",
                     fillColor: "#262626",
-                    strokeOpacity: 0.1,
+                    strokeOpacity: 0,
                     enableMassClear: false,
                     enableClicking: false,
                 }); //建立多边形覆盖物
-            this.bmapRef.map.addOverlay(ply);  //添加覆盖物
-            this.bmapRef.map.setViewport(ply.getPath());    //调整视野         
+            this.cityPly.set(i, ply);
         }
+
+        this.enableCityMarker();
     }
 
 
